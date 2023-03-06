@@ -1,0 +1,173 @@
+module: accedian-gateway-orchestrator
+  +--rw accedian-components
+  |  +--rw sensor-agent
+  |  |  +--rw agents
+  |  |     +--rw agent* [agentId]
+  |  |     |  +--rw agentId               string
+  |  |     |  +--rw agentName             string
+  |  |     |  +--ro state?                agent-state
+  |  |     |  +--ro status?               agent-status
+  |  |     |  +--rw agentType?            agent-type
+  |  |     |  +--rw agentconfiguration
+  |  |     |     +--rw dataGateway
+  |  |     |     |  +--rw server                             inet:ip-address
+  |  |     |     |  +--rw port?                              uint16
+  |  |     |     |  +--rw dataBrokerUseSsl?                  boolean
+  |  |     |     |  +--rw dataBrokerSslAllowSelfsigned?      boolean
+  |  |     |     |  +--rw dataBrokerSslAllowInsecureCerts?   boolean
+  |  |     |     |  +--rw dataBrokerSslAllowExpiredCerts?    boolean
+  |  |     |     |  +--rw dataBrokerSslSkipHostnameCheck?    boolean
+  |  |     |     |  +--rw pdgMetricsEnabled?                 boolean
+  |  |     |     |  +--rw brokerATO?                         int32
+  |  |     |     |  +--rw brokerATOMaxCount?                 int32
+  |  |     |     +--rw reflector!
+  |  |     |     |  +--rw reflectors* [reflectorType]
+  |  |     |     |     +--rw reflectorType    common:reflector-type
+  |  |     |     |     +--rw enable?          boolean
+  |  |     |     +--rw metadata* [keyName]
+  |  |     |        +--rw keyName    string
+  |  |     |        +--rw value?     string
+  |  |     +---x operateAgent
+  |  |        +---w input
+  |  |           +---w actionName?   common:supportedActionbySession
+  |  |           +---w agentId?      -> /accedian-components/sensor-agent/agents/agent/agentId
+  |  |           +---w sessions* [sessionId]
+  |  |              +---w sessionId    -> /sessions/session/sessionIdentifier
+  |  |              +---w overrides
+  |  |                 +---w ifStateful?    boolean
+  |  |                 +---w sessionType    common:session-type
+  |  |                 +---w throughput
+  |  |                    +---w testServerAddress?                      inet:ip-address
+  |  |                    +---w testServerPort?                         inet:port-number
+  |  |                    +---w testReverse?                            boolean
+  |  |                    +---w testDurationSecs?                       uint32
+  |  |                    +---w testReportIntervalSecs?                 decimal64
+  |  |                    +---w testParallel?                           uint32
+  |  |                    +---w testDscp?                               inet:dscp
+  |  |                    +---w testTracerouteDestPort?                 inet:port-number
+  |  |                    +---w networkMaxRateBitsPerSec?               uint32
+  |  |                    +---w networkMtuBytes?                        uint32
+  |  |                    +---w networkBottleneckBandwidthBitsPerSec?   uint32
+  |  |                    +---w networkRttMs?                           decimal64
+  |  +--rw sensor-control
+  |     +--rw endpoints
+  |        +--rw endpoint* [name type]
+  |        |  +--rw name           string
+  |        |  +--rw ip-address     inet:ip-address
+  |        |  +--rw description?   string
+  |        |  +--rw type           endpoint-type
+  |        |  +--rw mac?           common:mac
+  |        |  +--rw product        common:endpoint-product-type
+  |        |  +--rw serial-no?     string
+  |        |  +--ro state?         common:endpoint-State
+  |        |  +--ro errorInfo?     string
+  |        |  +--ro interfaces
+  |        |  |  +--ro interface* [name]
+  |        |  |     +--ro name         string
+  |        |  |     +--ro type?        endpoint-interface-type
+  |        |  |     +--ro mac?         common:mac
+  |        |  |     +--ro ipaddress* [ip]
+  |        |  |        +--ro ip    string
+  |        |  +--rw reflector
+  |        |     +--rw twampcp
+  |        |     |  +--rw controlAddr?     inet:ip-address
+  |        |     |  +--rw controlPort?     inet:port-number
+  |        |     |  +--rw controlDscp?     inet:dscp
+  |        |     |  +--rw controlVPrio?    uint16
+  |        |     |  +--rw controlLegacy?   boolean
+  |        |     |  +--rw tos?             uint8
+  |        |     +--rw capabilities*   reflector-capability
+  |        +---x operateControl
+  |           +---w input
+  |              +---w actionName?   supportedActionByEndpoint
+  |              +---w name?         -> /accedian-components/sensor-control/endpoints/endpoint/name
+  +--rw sessions
+  |  +--rw session* [sessionIdentifier orchestratorType]
+  |     +--rw sessionIdentifier    string
+  |     +--rw orchestratorType     common:orchestratorType
+  |     +--rw sessiontype?         common:session-type
+  |     +--rw ifStateful?          boolean
+  |     +--rw agent
+  |     |  +--rw agentId?            -> /accedian-components/sensor-agent/agents/agent/agentId
+  |     |  +--rw agentSessionName?   string
+  |     |  +--rw enable?             boolean
+  |     |  +--rw period?             string
+  |     +--rw control
+  |     |  +--rw description?             string
+  |     |  +--rw addressFamily?           common:addressFamily
+  |     |  +--rw gateWayAddress?          inet:ip-address
+  |     |  +--rw dscp?                    inet:dscp
+  |     |  +--rw source
+  |     |  |  +--rw endpointName?   -> /accedian-components/sensor-control/endpoints/endpoint/name
+  |     |  |  +--rw port?           inet:port-number
+  |     |  +--rw destination
+  |     |  |  +--rw endpointName?   -> /accedian-components/sensor-control/endpoints/endpoint/name
+  |     |  |  +--rw port?           inet:port-number
+  |     |  +--rw connectionParameters
+  |     |  |  +--rw interval?   uint32
+  |     |  |  +--rw tos?        uint8
+  |     |  |  +--rw ttl?        uint8
+  |     |  |  +--rw vprio?      uint8
+  |     |  |  +--rw megLevel?   uint8
+  |     |  +--rw labels*                  string
+  |     |  +--rw stream
+  |     |  |  +--rw payloadSize    uint32
+  |     |  |  +--rw pps            decimal64
+  |     |  |  +--rw type?          common:session-stream-type
+  |     |  |  +--rw ethoamtype?    common:ethoam-session-stream-type
+  |     |  +---x operateControlSession
+  |     |     +---w input
+  |     |        +---w actionName?   supportedActionBycontrolSession
+  |     +--rw twamp
+  |     |  +--rw senderAddr?           inet:ip-address
+  |     |  +--rw senderPort?           uint32
+  |     |  +--rw senderInterface?      string
+  |     |  +--rw senderPlsize?         uint32
+  |     |  +--rw senderRate?           uint32
+  |     |  +--rw senderDscp?           inet:dscp
+  |     |  +--rw senderTtl?            uint32
+  |     |  +--rw senderVPrio?          uint32
+  |     |  +--rw reflectorAddr?        inet:ip-address
+  |     |  +--rw reflectorPort?        inet:port-number
+  |     |  +--rw reflectorInterface?   string
+  |     |  +--rw reportInterval?       uint32
+  |     |  +--rw controlAddr?          inet:ip-address
+  |     |  +--rw controlPort?          inet:port-number
+  |     |  +--rw controlDscp?          inet:dscp
+  |     |  +--rw controlVPrio?         uint16
+  |     |  +--rw controlLegacy?        boolean
+  |     |  +--rw tos?                  uint8
+  |     +--rw throughput
+  |     |  +--rw testServerAddress?                      inet:ip-address
+  |     |  +--rw testServerPort?                         inet:port-number
+  |     |  +--rw testReverse?                            boolean
+  |     |  +--rw testDurationSecs?                       uint32
+  |     |  +--rw testReportIntervalSecs?                 decimal64
+  |     |  +--rw testParallel?                           uint32
+  |     |  +--rw testDscp?                               inet:dscp
+  |     |  +--rw testTracerouteDestPort?                 inet:port-number
+  |     |  +--rw networkMaxRateBitsPerSec?               uint32
+  |     |  +--rw networkMtuBytes?                        uint32
+  |     |  +--rw networkBottleneckBandwidthBitsPerSec?   uint32
+  |     |  +--rw networkRttMs?                           decimal64
+  |     +--rw trace
+  |     |  +--rw destination?       string
+  |     |  +--rw destinationPort?   uint32
+  |     |  +--rw senderPort?        uint32
+  |     |  +--rw algorithm?         string
+  |     |  +--rw type?              session-trace-type
+  |     |  +--rw probingRate?       uint32
+  |     |  +--rw senderTtlMin?      uint32
+  |     |  +--rw senderTtlMax?      uint32
+  |     |  +--rw senderDscp?        inet:dscp
+  |     |  +--rw probesPerHop?      uint32
+  |     |  +--rw maxUndiscovered?   uint32
+  |     |  +--rw waitSec?           uint32
+  |     |  +--rw testDurationSec?   uint32
+  |     +--ro statusMessage?       string
+  |     +--ro state?               common:session-State
+  |     +--ro captureTime?         string
+  +--rw idGenerator
+     +---x generateUUID
+        +--ro output
+           +--ro uuid?   string

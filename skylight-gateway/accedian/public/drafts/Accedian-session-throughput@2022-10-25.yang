@@ -1,0 +1,162 @@
+module Accedian-session-throughput {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/throughput";
+  prefix acdstp;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdstype;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "TODO.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2022-10-25 {
+    description
+      "Initial revision";
+  }
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:throughput-session'" {
+      description
+        "Augment the service session protocol of Accedian-service-session with througput
+        config data";
+
+    }
+
+    container throughput {
+      leaf port {
+        type inet:port-number;
+      }
+
+      leaf mode {
+        type enumeration {
+          enum client;
+          enum server;
+        }
+        description
+          "In server mode the agent is listening for a connection on the port testServerPort. The
+          agent ignores all other parameters in server mode";
+      }
+
+      leaf server-address {
+        type inet:host;
+        description
+          "IP address of the test server";
+      }
+
+      leaf server-port {
+        type inet:port-number;
+        default 5201;
+        description
+          "IP port of the test server";
+      }
+
+      leaf reverse {
+        type boolean;
+        default false;
+        description
+          "False means TCP traffic from agent-to-server";
+      }
+
+      leaf duration-secs {
+        type uint32 {
+          range 0..86400;
+        }
+        default 60;
+        description
+          "Duration in seconds for the throughput test. testDurationSecs is ignored by the baseline test";
+      }
+
+      leaf report-interval-secs {
+        type uint8 {
+          range 1..60;
+        }
+        default 1;
+        description
+          "Throughput test metrics reporting interval in seconds. testReportIntervalSecs is
+          ignored by the baseline test";
+      }
+
+      leaf parallel {
+        type uint8 {
+          range 1..128;
+        }
+        default 1;
+        description
+          "The number of simultaneous connections to make to the server";
+      }
+
+      leaf dscp {
+        type inet:dscp;
+        default 0;
+        description
+          "The Differentiated Services Code Point values in the IP header";
+      }
+
+      leaf traceroute-dest-port {
+        type inet:port-number;
+        default 33434;
+        description
+          "Destination IP port of the tracetroute probe. Usually, testTracerouteDestPort = testServerPort";
+      }
+
+      leaf network-max-rate-bits-per-sec {
+        type uint32;
+        default 0;
+        description
+          "Maximum rate in bits-per-second in baseline and throughput test phase. Zero means unbound";
+      }
+
+      leaf network-mtu-bytes {
+        type uint16 {
+          range 0..9000;
+        }
+        description
+          "Maximum Transmission Unit in bytes. This parameter is required by the throughput
+          test. This parameter can be omitted or set to zero before running the baseline test
+          to request for discovery";
+      }
+
+      leaf network-bottleneck-bandwidth-bits-per-sec {
+        type uint32;
+        description
+          "TCP bottleneck bandwidth in bits-per-second. This parameter is required by the throughput
+          test. This parameter can be omitted or set to zero before running the baseline test to
+          request for discovery";
+      }
+
+      leaf network-rtt-ms {
+        type uint32;
+        description
+          "Round-trip time in milliseconds. This parameter is required by the throughput test. This
+          parameter can be omitted or set to zero before running the baseline test to request
+          for discovery";
+      }
+    }
+  }
+}

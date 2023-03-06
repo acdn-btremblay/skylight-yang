@@ -1,0 +1,115 @@
+module: Accedian-service
+  +--rw services
+     +--rw service* [service-id]
+        +--rw service-id            acdt:id
+        +--rw service-name?         acdt:id
+        +--rw description?          string
+        +--rw type?                 identityref
+        +--rw service-definition
+        +--rw sessions* [session-id]
+           +--rw session-id    -> /acdses:sessions/session/session-id
+
+  rpcs:
+    +---x delete-service
+       +---w input
+          +---w target
+             +---w service-id                  acdt:id
+             +---w delete-service-endpoints?   boolean
+
+  notifications:
+    +---n state-change-event
+       +--ro service-id?             acdt:id
+       +--ro session-state-change* [session-id]
+          +--ro session-id                       acdt:id
+          +--ro status?                          service-session-status
+          +--ro errors
+          |  +--ro error* []
+          |     +--ro tag?   error-tag
+          |     +--ro msg?   string
+          +--ro service-endpoint-state-change* [endpoint-id]
+             +--ro endpoint-id    acdt:id
+             +--ro status?        service-endpoint-status
+             +--ro errors
+                +--ro error* []
+                   +--ro tag?   error-tag
+                   +--ro msg?   string
+
+module: Accedian-service-endpoint
+  +--rw service-endpoints
+     +--rw service-endpoint* [endpoint-id]
+        +--rw endpoint-id      acdt:id
+        +--rw endpoint-name?   acdt:id
+        +--rw description?     string
+        +--rw type?            identityref
+        +--rw config
+        |  +--rw acdsepne:ne-config
+        |     +--rw acdsepne:ne-id?     acdt:id
+        |     +--rw acdsepne:vlan-id?   uint16
+        |     +--rw acdsepne:ip?        inet:ip-address
+        +--ro state
+           +--ro version?        string
+           +--ro capabilities*   identityref
+           +--ro status
+              +--ro status?   service-endpoint-status
+              +--ro errors
+                 +--ro error* []
+                    +--ro tag?   error-tag
+                    +--ro msg?   string
+
+  notifications:
+    +---n state-change-event
+       +--ro endpoint-id?   acdt:id
+       +--ro status?        service-endpoint-status
+       +--ro errors
+          +--ro error* []
+             +--ro tag?   error-tag
+             +--ro msg?   string
+
+module: Accedian-session
+  +--rw sessions
+     +--rw session* [session-id]
+        +--rw session-id           acdt:id
+        +--rw session-name?        acdt:id
+        +--rw description?         string
+        +--rw session-type?        identityref
+        +--rw service-endpoints* [endpoint-id]
+        |  +--rw endpoint-id         -> /acdsep:service-endpoints/service-endpoint/endpoint-id
+        |  +--rw session-protocol
+        |     +--rw acdstwl:twamp-light
+        |        +--rw acdstwl:session-sender {session-sender}?
+        |        |  +--rw acdstwl:admin-state?                     boolean
+        |        |  +--rw acdstwl:sender-ip?                       inet:ip-address
+        |        |  +--rw acdstwl:sender-udp-port?                 union
+        |        |  +--rw acdstwl:reflector-ip?                    inet:ip-address
+        |        |  +--rw acdstwl:reflector-udp-port?              inet:port-number
+        |        |  +--rw acdstwl:report-interval?                 uint16
+        |        |  +--rw acdstwl:reflector-latency-subtraction?   boolean
+        |        |  +--rw acdstwl:test-packets
+        |        |     +--rw acdstwl:number-of-packets?   union
+        |        |     +--rw acdstwl:payload-size?        uint32
+        |        |     +--rw acdstwl:rate?                uint16
+        |        |     +--rw acdstwl:dscp?                inet:dscp
+        |        |     +--rw acdstwl:ttl?                 uint8
+        |        |     +--rw acdstwl:vlan-priority?       uint8
+        |        +--rw acdstwl:session-reflector {session-reflector}?
+        |           +--rw acdstwl:admin-state?          boolean
+        |           +--rw acdstwl:reflector-udp-port?   inet:port-number
+        |           +--rw acdstwl:mode?                 reflector-mode
+        +--ro status
+        |  +--ro status?   service-session-status
+        |  +--ro errors
+        |     +--ro error* []
+        |        +--ro tag?   error-tag
+        |        +--ro msg?   string
+        +--rw auto-start?          boolean
+        +---x start
+        +---x stop
+
+  notifications:
+    +---n state-change-event
+       +--ro session-id?   acdt:id
+       +--ro status?       service-session-status
+       +--ro errors
+          +--ro error* []
+             +--ro tag?   error-tag
+             +--ro msg?   string
