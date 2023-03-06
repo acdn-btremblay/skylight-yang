@@ -1,0 +1,193 @@
+module accedian-trace {
+
+    yang-version 1.1;
+    namespace urn:accedian:params:xml:ns:yang:accedian-trace;
+    prefix accedian-trace;
+
+    import ietf-inet-types {
+        prefix inet;
+    }
+
+    organization
+      "Accedian";
+
+    contact
+      "Web URL: https://accedian.com/
+       E-mail: info@accedian.com
+          Phone:   1.514.331.6181 or +1.866.685.8181";
+
+    description
+      "This yang module defines Accedian Trace session configuration";
+
+    revision 2022-06-14 {
+        description
+          "Initial Revision";
+        reference
+          "accedian-trace : Trace configuration module";
+    }
+
+    typedef session-trace-type {
+
+        type enumeration {
+            enum "icmp" {
+
+                description
+                  "indicates icmp trace type";
+            }
+            enum "tcp" {
+
+                description
+                  "indicates tcp trace type";
+            }
+            enum "udp" {
+
+                description
+                  "indicates udp trace type";
+            }
+        }
+        description
+          "List of session stream media type";
+    }
+
+    typedef ip-version {
+        type enumeration {
+            enum "IPv4" {
+
+                description
+                  "indicates icmp trace type";
+            }
+            enum "IPv6" {
+
+                description
+                  "indicates tcp trace type";
+            }
+        }
+        description
+          "Version of IP. By default, the agent automatically detects the IP version.";
+    }
+
+    grouping trace-group {
+        description
+          "Grouping of Trace parameters";
+
+        leaf destination {
+            type string;
+            description
+              "Trace IPv4 address, IPv6 address or FQDN";
+        }
+
+        leaf destinationPort {
+            type uint32{
+                range "1..65535";
+            }
+            default "33457";
+            description
+              "Destination port number for trace";
+        }
+
+        leaf senderPort {
+            type uint32{
+                range "1..65535";
+            }
+            default "33456";
+            description
+              "Sender port number for trace";
+        }
+
+        leaf ipVersion {
+            type ip-version;
+            description
+              "Version of IP. By default, the agent automatically detects the IP version.";
+        }
+
+        leaf algorithm {
+            type string;
+            description
+              "Trace algoritm";
+        }
+
+        leaf type {
+            type session-trace-type;
+            default udp;
+            description
+              "Trace type";
+        }
+
+        leaf probingRate {
+            type uint32{
+                range "1..99";
+            }
+            default "10";
+            description
+              "Trace probing rate. Probes per second";
+        }
+
+        leaf senderTtlMin {
+            type uint32{
+                range "1..255";
+            }
+            default "1";
+            description
+              "Start the first probe from this TTL instead of 1";
+        }
+
+        leaf senderTtlMax {
+            type uint32{
+                range "1..255";
+            }
+            default "30";
+            description
+              "Set the max number of hops to be reached";
+        }
+
+        leaf senderDscp {
+            type inet:dscp;
+            default "32";
+            description
+              "sender dscp value for trace, DSCP value used by the IP probes, value 0 means CS0";
+        }
+
+        leaf probesPerHop {
+            type uint32{
+                range "1..255";
+            }
+            default "3";
+            description
+              "number of probes sent per hop";
+        }
+
+        leaf maxUndiscovered {
+            type uint32{
+                range "1..255";
+            }
+            default "3";
+            description
+              "maximum number of consecutive unresponsive hops causing test abort";
+        }
+
+        leaf waitSec {
+            type uint32{
+                range 0..max;
+            }
+            default "5";
+            description
+              "number of seconds to wait for a probe response";
+        }
+
+        leaf testDurationSec {
+            type uint32{
+                range 0..max;
+            }
+            default "180";
+            description
+              "timeout in seconds of the measurement (pass 0 to set it to infinity)";
+        }
+    }
+
+    container trace {
+        description
+          "properties of trace test";
+
+        uses trace-group;
+    }
+}

@@ -1,0 +1,86 @@
+module SGW-endpoint-logic {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/SGW/endpoint/logic";
+  prefix eplogcfg;
+
+  import Accedian-service-endpoint {
+    prefix acdsep;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module is for internal use in the Skylight Gateway applicaiton. It
+    contains internal configuration.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-01-26 {
+    description
+      "Initial revision";
+  }
+
+  container config {
+
+    list endpoint-to-session-refs {
+      description
+        "A list containing service-endpoint to session relations. I allow
+        to find out which session is involved with which session. A reverse
+        lookup from the public model session to endpoint relation";
+      key endpoint-id;
+
+      leaf endpoint-id {
+        type leafref {
+          path "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:endpoint-id";
+        }
+        description
+          "A reference to an existing service endpoint identifier";
+      }
+
+      list session {
+        description
+          "The list of sessions associated to this endpoint";
+        key session-id;
+
+        leaf session-id {
+          description
+            "A reference pointing to an existing session";
+          type leafref {
+            path "/acdses:sessions/acdses:session/acdses:session-id";
+          }
+        }
+
+        leaf reflector-state {
+          type boolean;
+          description
+            "Indicate if this session is using this endpoint as a reflector. Endpoints acting
+            as endpoint is a special and need special handling when creating deleting
+            the sessions";
+        }
+
+        leaf reflector-udp-port {
+          type uint16;
+          description
+            "The reflector UDP port number";
+        }
+      }
+    }
+  }
+}

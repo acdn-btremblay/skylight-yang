@@ -1,0 +1,60 @@
+module Accedian-session-sat {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/sat";
+  prefix acdssat;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdst;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "TODO.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2022-10-25 {
+    description
+      "Initial revision";
+  }
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when 'derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, "acdst:sat-session")';
+
+    container rfc2544 {
+
+
+      leaf port {
+        type inet:port-number;
+      }
+    }
+
+    container y1564 {
+      leaf port {
+        type inet:port-number;
+      }
+    }
+  }
+}

@@ -1,0 +1,107 @@
+module: accedian-notifications
+  +--rw alert-policies
+     +--rw alert-policy* [policyId]
+        +--rw policyId              string
+        +--rw policyName?           string
+        +--rw policy-description?   string
+        +--rw isSubscribed?         boolean
+        +--rw tags?                 string
+        +--rw enabled?              boolean
+        +--rw deleted?              boolean
+        +--rw useCleanData?         boolean
+        +--rw useBusyHourOnly?      boolean
+        +--rw useMaintenance?       boolean
+        +--rw configuration
+        |  +--rw policy-type?              policy-type
+        |  +--rw aggregationGranularity?   string
+        |  +--rw severity?                 accedian-metadata:severity
+        |  +--rw killchain?                accedian-metadata:killchain
+        |  +--rw context*                  string
+        |  +--rw condition
+        |     +--rw metric
+        |     |  +--rw id?           string
+        |     |  +--rw type?         accedian-metadata:metric-type
+        |     |  +--rw layer?        string
+        |     |  +--rw vendor?       string
+        |     |  +--rw objectType*   string
+        |     |  +--rw direction*    string
+        |     +--rw recoversOn
+        |     |  +--rw comparator?   accedian-metadata:comparator
+        |     |  +--rw value?        string
+        |     |  +--rw duration?     string
+        |     +--rw triggersOn
+        |        +--rw comparator?   accedian-metadata:comparator
+        |        +--rw value?        string
+        |        +--rw duration?     string
+        +--ro lastModifiedTime?     yang:date-and-time
+        +--ro _rev?                 string
+        +--ro tenantId?             string
+        +--ro tenantName?           string
+
+  notifications:
+    +---n alertNotification
+       +--ro alert
+          +--ro policyId                        -> /alert-policies/alert-policy/policyId
+          +--ro policyName?                     -> /alert-policies/alert-policy/policyName
+          +--ro policyType?                     -> /alert-policies/alert-policy/configuration/policy-type
+          +--ro alertState?                     alert-state
+          +--ro duration?                       uint32
+          +--ro topology?                       string
+          +--ro objectId                        string
+          +--ro objectName?                     string
+          +--ro objectType?                     object-type
+          +--ro source?                         string
+          +--ro processedTimestamp?             yang:date-and-time
+          +--ro startTimestamp?                 yang:date-and-time
+          +--ro timestamp?                      yang:date-and-time
+          +--ro timeInViolation?                uint32
+          +--ro tenantId?                       string
+          +--ro tenantName?                     string
+          +--ro uid?                            yang:uuid
+          +--ro uri?                            string
+          +--ro annotation?                     string
+          +--ro metric?                         string
+          +--ro direction?                      uint16
+          +--ro tags?                           string
+          +--ro alertValue?                     uint64
+          +--ro comparator?                     accedian-metadata:comparator
+          +--ro sessionId?                      -> /gateway-orchestrator:sessions/session/sessionIdentifier
+          +--ro bcn?                            string
+          +--ro bca?                            string
+          +--ro ip?                             inet:ip-address
+          +--ro captureLayer?                   string
+          +--ro captureZone?                    string
+          +--ro captureApplicationId?           string
+          +--ro captureZoneId?                  string
+          +--ro captureMetaThresholds?          string
+          +--ro captureMetaValues?              string
+          +--ro captureMetaIps?                 string
+          +--ro captureMetaDesc?                string
+          +--ro captureMetaDate_stop?           yang:date-and-time
+          +--ro captureMetaDate_start?          yang:date-and-time
+          +--ro captureMetaIp_client?           string
+          +--ro captureMetaIp_count?            uint32
+          +--ro captureMetaStart?               uint32
+          +--ro captureMetaStop?                uint32
+          +--ro captureMetaName?                string
+          +--ro captureMetaAlert_id?            uint32
+          +--ro captureMetaNow?                 uint32
+          +--ro captureMetaFirst_sent?          uint32
+          +--ro captureMetaLast_sent?           uint32
+          +--ro captureMetaSite?                string
+          +--ro captureMetaWorker?              string
+          +--ro captureMetaFiring?              string
+          +--ro captureMetaCertainty?           uint32
+          +--ro captureMetaCertainty_percent?   string
+          +--ro captureClientZoneId?            string
+          +--ro captureServerZoneId?            string
+          +--ro severity?                       accedian-metadata:severity
+          +--ro sourceIp?                       inet:ip-address
+          +--ro sourcePort?                     inet:port-number
+          +--ro destinationIp?                  inet:ip-address
+          +--ro destinationPort?                inet:port-number
+          +--ro killchain?                      accedian-metadata:killchain
+          +--ro securityJobType?                string
+          +--ro sourceNetworkAssetRoles?        string
+          +--ro destinationNetworkAssetRoles?   string
+          +--ro securityState?                  securityState
