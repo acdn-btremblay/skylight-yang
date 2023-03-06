@@ -1,0 +1,25 @@
+module: accedian-metadata
+  +--rw metadata
+  |  +--rw monitoredObject
+  |     +--ro objectId?          -> /gateway-orchestrator:sessions/session/sessionIdentifier
+  |     +--rw geo
+  |     |  +--rw startPoint
+  |     |  |  +--rw name?        string
+  |     |  |  +--rw latitude?    decimal64
+  |     |  |  +--rw longitude?   decimal64
+  |     |  +--rw endPoint
+  |     |     +--rw name?        string
+  |     |     +--rw latitude?    decimal64
+  |     |     +--rw longitude?   decimal64
+  |     +--rw topology* [hop-name]
+  |     |  +--rw hop-name    string
+  |     +--rw metadataElement* [name]
+  |        +--rw name     -> /metadataConfig/metadataCategory/name
+  |        +--rw value?   string
+  +--rw metadataConfig
+     +--ro metadataConfigId?   yang:uuid
+     +--ro tenantId            string
+     +--ro tenantName?         string
+     +--rw metadataCategory* [name]
+        +--rw name        string
+        +--rw isActive?   boolean

@@ -1,0 +1,161 @@
+module Accedian-session {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session";
+  prefix acdses;
+
+  import Accedian-type {
+    prefix acdt;
+  }
+
+  import Accedian-session-type {
+    prefix acdst;
+  }
+
+  import Accedian-service-endpoint {
+    prefix acdsep;
+  }
+
+  import Accedian-extensions {
+    prefix acdext;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition of an Accedian service
+    session. It is session-protocol and service-endpoint data agnostic
+    by design.
+
+    Session protocol specific models are added through session protocol
+    modules. Their implementation is contained in modules following the
+    format: Accedian-session-<proto>.yang. They augment the service
+    model when sessions:type match.
+
+    Session endpoints are specified by refering to pre-existing endpoint IDs.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-02-10 {
+    description
+      "Initial revision ";
+  }
+
+  notification state-change-event {
+    description
+      "This notification is sent when the state of the session changes";
+
+    leaf session-id {
+      description
+        "An identifier specifying on which session the state-change happened. This
+        leaf will match the name of an existing session ID (i.e the value
+        of /sessions/session/session-id)";
+      type acdt:id;
+    }
+
+    uses acdst:service-session-state-data;
+  }
+
+  container sessions {
+    list session {
+      description
+        "A list of all the configured sessions. The sessions are identified by
+        a session id";
+      key session-id;
+      unique session-name;
+
+      leaf session-id {
+        type acdt:id;
+        acdext:tag-metadata session_id;
+        description
+          "Unique identifier for the session.
+          tag-metadata: This leaf will be included as part of the analytics
+          metadata as { session_id : <session-id> }";
+      }
+
+      leaf session-name {
+      type acdt:id;
+      acdext:tag-metadata session_name;
+      description
+        "An optional human readable session name. When provided, the field must
+        be unique through all the 'list session' instances.
+        'session-name' can be used as an extra metadata query parameter in
+        analytics in addition to the session-id. It can also be configured
+        to query more easily the analytics when the session-id is in non-human
+        readble form (numerical, UUIDs, etc...).
+        tag-metadata: This leaf will be included as part of the analytics
+        metadata as { session_name : <session-name> }";
+      }
+
+      leaf description {
+        type string;
+        description
+          "An optional human readable description for this session";
+      }
+
+      leaf session-type {
+        type identityref {
+          base acdst:session;
+        }
+        description
+          "The type of service configured for this session";
+      }
+
+      list service-endpoints {
+        description
+          "The list of service endpoints involved in the session.";
+        key endpoint-id;
+
+        leaf endpoint-id {
+          type leafref {
+            path "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:endpoint-id";
+          }
+          description
+            "A reference to the service endpoint unique identifier";
+        }
+
+        container session-protocol {
+          description
+            "Protocol/session-service specific configuration for this endpoint. The configuration
+            is dependent on the session protocol type specified in /sessions/session/session-type.
+            It is Implemented as a Yang augment mount point";
+        }
+      }
+
+      container status {
+        config false;
+        uses acdst:service-session-state-data;
+      }
+
+      leaf auto-start {
+        type boolean;
+        default false;
+        description
+          "If set to true, the session will be started automatically when configured. If set to
+          false (default), a subsequent start action is required to start the session";
+      }
+
+      action start {
+        description
+          "This action will start the session";
+      }
+
+      action stop {
+        description
+          "This action will stop the session";
+      }
+    }
+  }
+}

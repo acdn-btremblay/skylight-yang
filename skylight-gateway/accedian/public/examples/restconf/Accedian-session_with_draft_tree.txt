@@ -1,0 +1,265 @@
+module: Accedian-service
+  +--rw services
+     +--rw service* [service-id]
+        +--rw service-id            acdt:id
+        +--rw service-name?         acdt:id
+        +--rw description?          string
+        +--rw type?                 identityref
+        +--rw service-definition
+        |  +--rw acdsl3vpn:l3vpn-config
+        +--rw sessions* [session-id]
+           +--rw session-id    -> /acdses:sessions/session/session-id
+
+  rpcs:
+    +---x delete-service
+       +---w input
+          +---w target
+             +---w service-id                  acdt:id
+             +---w delete-service-endpoints?   boolean
+
+  notifications:
+    +---n state-change-event
+       +--ro service-id?             acdt:id
+       +--ro session-state-change* [session-id]
+          +--ro session-id                       acdt:id
+          +--ro status?                          service-session-status
+          +--ro errors
+          |  +--ro error* []
+          |     +--ro tag?   error-tag
+          |     +--ro msg?   string
+          +--ro service-endpoint-state-change* [endpoint-id]
+             +--ro endpoint-id    acdt:id
+             +--ro status?        service-endpoint-status
+             +--ro errors
+                +--ro error* []
+                   +--ro tag?   error-tag
+                   +--ro msg?   string
+
+module: Accedian-service-endpoint
+  +--rw service-endpoints
+     +--rw service-endpoint* [endpoint-id]
+        +--rw endpoint-id      acdt:id
+        +--rw endpoint-name?   acdt:id
+        +--rw description?     string
+        +--rw type?            identityref
+        +--rw config
+        |  +--rw acdsepne:ne-config
+        |  |  +--rw acdsepne:ne-id?     acdt:id
+        |  |  +--rw acdsepne:vlan-id?   uint16
+        |  |  +--rw acdsepne:ip?        inet:ip-address
+        |  +--rw acdsepagt:agent-config
+        |  |  +--rw acdsepagt:agent-id?   string
+        |  +--rw acdsepso:so-config
+        |     +--rw acdsepso:vce-id?   string
+        +--ro state
+           +--ro version?        string
+           +--ro capabilities*   identityref
+           +--ro status
+              +--ro status?   service-endpoint-status
+              +--ro errors
+                 +--ro error* []
+                    +--ro tag?   error-tag
+                    +--ro msg?   string
+
+  notifications:
+    +---n state-change-event
+       +--ro endpoint-id?   acdt:id
+       +--ro status?        service-endpoint-status
+       +--ro errors
+          +--ro error* []
+             +--ro tag?   error-tag
+             +--ro msg?   string
+
+module: Accedian-session
+  +--rw sessions
+     +--rw session* [session-id]
+        +--rw session-id           acdt:id
+        +--rw session-name?        acdt:id
+        +--rw description?         string
+        +--rw session-type?        identityref
+        +--rw service-endpoints* [endpoint-id]
+        |  +--rw endpoint-id         -> /acdsep:service-endpoints/service-endpoint/endpoint-id
+        |  +--rw session-protocol
+        |     +--rw acdstwl:twamp-light
+        |     |  +--rw acdstwl:session-sender {session-sender}?
+        |     |  |  +--rw acdstwl:admin-state?                     boolean
+        |     |  |  +--rw acdstwl:sender-ip?                       inet:ip-address
+        |     |  |  +--rw acdstwl:sender-udp-port?                 union
+        |     |  |  +--rw acdstwl:reflector-ip?                    inet:ip-address
+        |     |  |  +--rw acdstwl:reflector-udp-port?              inet:port-number
+        |     |  |  +--rw acdstwl:report-interval?                 uint16
+        |     |  |  +--rw acdstwl:reflector-latency-subtraction?   boolean
+        |     |  |  +--rw acdstwl:test-packets
+        |     |  |     +--rw acdstwl:number-of-packets?   union
+        |     |  |     +--rw acdstwl:payload-size?        uint32
+        |     |  |     +--rw acdstwl:rate?                uint16
+        |     |  |     +--rw acdstwl:dscp?                inet:dscp
+        |     |  |     +--rw acdstwl:ttl?                 uint8
+        |     |  |     +--rw acdstwl:vlan-priority?       uint8
+        |     |  +--rw acdstwl:session-reflector {session-reflector}?
+        |     |     +--rw acdstwl:admin-state?          boolean
+        |     |     +--rw acdstwl:reflector-udp-port?   inet:port-number
+        |     |     +--rw acdstwl:mode?                 reflector-mode
+        |     +--rw acdsecho:echo
+        |     |  +--rw acdsecho:sender
+        |     |  |  +--rw acdsecho:addr?           inet:host
+        |     |  |  +--rw acdsecho:port?           inet:port-number
+        |     |  |  +--rw acdsecho:payload-size?   uint16
+        |     |  |  +--rw acdsecho:rate?           uint16
+        |     |  |  +--rw acdsecho:dscp?           inet:dscp
+        |     |  |  +--rw acdsecho:ttl?            uint8
+        |     |  |  +--rw acdsecho:vprio?          uint8
+        |     |  +--rw acdsecho:reflector
+        |     |     +--rw acdsecho:addr?              string
+        |     |     +--rw acdsecho:port?              inet:port-number
+        |     |     +--rw acdsecho:report-interval?   uint16
+        |     +--rw acdspt:pathtrace
+        |     |  +--rw acdspt:port?                inet:port-number
+        |     |  +--rw acdspt:destination?         inet:host
+        |     |  +--rw acdspt:destination-port?    inet:port-number
+        |     |  +--rw acdspt:sender-port?         inet:port-number
+        |     |  +--rw acdspt:ip-version?          inet:ip-version
+        |     |  +--rw acdspt:algorithm?           string
+        |     |  +--rw acdspt:type?                enumeration
+        |     |  +--rw acdspt:probing-rate?        uint8
+        |     |  +--rw acdspt:sender-ttl-min?      uint8
+        |     |  +--rw acdspt:sender-ttl-max?      uint8
+        |     |  +--rw acdspt:sender-dscp?         inet:dscp
+        |     |  +--rw acdspt:probes-per-hop?      uint8
+        |     |  +--rw acdspt:max-undiscovered?    uint8
+        |     |  +--rw acdspt:wait-sec?            uint32
+        |     |  +--rw acdspt:test-duration-sec?   uint32
+        |     +--rw acdssat:rfc2544
+        |     |  +--rw acdssat:port?   inet:port-number
+        |     +--rw acdssat:y1564
+        |     |  +--rw acdssat:port?   inet:port-number
+        |     +--rw acdstp:throughput
+        |     |  +--rw acdstp:port?                                        inet:port-number
+        |     |  +--rw acdstp:mode?                                        enumeration
+        |     |  +--rw acdstp:server-address?                              inet:host
+        |     |  +--rw acdstp:server-port?                                 inet:port-number
+        |     |  +--rw acdstp:reverse?                                     boolean
+        |     |  +--rw acdstp:duration-secs?                               uint32
+        |     |  +--rw acdstp:report-interval-secs?                        uint8
+        |     |  +--rw acdstp:parallel?                                    uint8
+        |     |  +--rw acdstp:dscp?                                        inet:dscp
+        |     |  +--rw acdstp:traceroute-dest-port?                        inet:port-number
+        |     |  +--rw acdstp:network-max-rate-bits-per-sec?               uint32
+        |     |  +--rw acdstp:network-mtu-bytes?                           uint16
+        |     |  +--rw acdstp:network-bottleneck-bandwidth-bits-per-sec?   uint32
+        |     |  +--rw acdstp:network-rtt-ms?                              uint32
+        |     +--rw acdstwamp:twamp
+        |        +--rw acdstwamp:client {control-client}?
+        |        |  +--rw acdstwamp:admin-state?             boolean
+        |        |  +--rw acdstwamp:mode-preference-chain* [priority]
+        |        |  |  +--rw acdstwamp:priority    uint16
+        |        |  |  +--rw acdstwamp:mode?       twamp-modes
+        |        |  +--rw acdstwamp:key-chain* [key-id]
+        |        |  |  +--rw acdstwamp:key-id        string
+        |        |  |  +--rw acdstwamp:secret-key?   binary
+        |        |  +--rw acdstwamp:ctrl-connection
+        |        |     +--rw acdstwamp:client-ip?              inet:ip-address
+        |        |     +--rw acdstwamp:server-ip               inet:ip-address
+        |        |     +--rw acdstwamp:server-tcp-port?        inet:port-number
+        |        |     +--rw acdstwamp:control-packet-dscp?    inet:dscp
+        |        |     +--rw acdstwamp:key-id?                 string
+        |        |     +--rw acdstwamp:max-count-exponent?     uint8
+        |        |     +--ro acdstwamp:client-tcp-port?        inet:port-number
+        |        |     +--ro acdstwamp:server-start-time?      uint64
+        |        |     +--ro acdstwamp:repeat-count?           uint64
+        |        |     +--ro acdstwamp:state?                  control-client-connection-state
+        |        |     +--ro acdstwamp:selected-mode?          twamp-modes
+        |        |     +--ro acdstwamp:token?                  binary
+        |        |     +--ro acdstwamp:client-iv?              binary
+        |        |     +--rw acdstwamp:test-session-request
+        |        |        +--rw acdstwamp:sender-ip?            inet:ip-address
+        |        |        +--rw acdstwamp:sender-udp-port?      union
+        |        |        +--rw acdstwamp:reflector-ip          inet:ip-address
+        |        |        +--rw acdstwamp:reflector-udp-port?   inet:port-number
+        |        |        +--rw acdstwamp:timeout?              uint64
+        |        |        +--rw acdstwamp:padding-length?       uint32
+        |        |        +--rw acdstwamp:test-packet-dscp?     inet:dscp
+        |        |        +--rw acdstwamp:start-time?           uint64
+        |        |        +--rw acdstwamp:repeat?               uint32
+        |        |        +--rw acdstwamp:repeat-interval?      uint32
+        |        |        +--rw acdstwamp:pm-reg-list* [pm-index]
+        |        |        |  +--rw acdstwamp:pm-index    uint16
+        |        |        +--ro acdstwamp:state?                test-session-state
+        |        |        +--ro acdstwamp:sid?                  string
+        |        +--rw acdstwamp:server {server}?
+        |        |  +--rw acdstwamp:admin-state?           boolean
+        |        |  +--rw acdstwamp:server-tcp-port?       inet:port-number
+        |        |  +--rw acdstwamp:servwait?              uint32
+        |        |  +--rw acdstwamp:control-packet-dscp?   inet:dscp
+        |        |  +--rw acdstwamp:count?                 uint8
+        |        |  +--rw acdstwamp:max-count-exponent?    uint8
+        |        |  +--rw acdstwamp:modes?                 twamp-modes
+        |        |  +--rw acdstwamp:key-chain* [key-id]
+        |        |  |  +--rw acdstwamp:key-id        string
+        |        |  |  +--rw acdstwamp:secret-key?   binary
+        |        |  +--ro acdstwamp:ctrl-connection* [client-ip client-tcp-port server-ip server-tcp-port]
+        |        |     +--ro acdstwamp:client-ip              inet:ip-address
+        |        |     +--ro acdstwamp:client-tcp-port        inet:port-number
+        |        |     +--ro acdstwamp:server-ip              inet:ip-address
+        |        |     +--ro acdstwamp:server-tcp-port        inet:port-number
+        |        |     +--ro acdstwamp:state?                 server-ctrl-connection-state
+        |        |     +--ro acdstwamp:control-packet-dscp?   inet:dscp
+        |        |     +--ro acdstwamp:selected-mode?         twamp-modes
+        |        |     +--ro acdstwamp:key-id?                string
+        |        |     +--ro acdstwamp:count?                 uint8
+        |        |     +--ro acdstwamp:max-count-exponent?    uint8
+        |        |     +--ro acdstwamp:salt?                  binary
+        |        |     +--ro acdstwamp:server-iv?             binary
+        |        |     +--ro acdstwamp:challenge?             binary
+        |        +--rw acdstwamp:session-sender {session-sender}?
+        |        |  +--rw acdstwamp:admin-state?    boolean
+        |        |  +--rw acdstwamp:test-session
+        |        |     +--rw acdstwamp:fill-mode?                 padding-fill-mode
+        |        |     +--rw acdstwamp:number-of-packets          uint32
+        |        |     +--rw (acdstwamp:packet-distribution)?
+        |        |     |  +--:(acdstwamp:periodic)
+        |        |     |  |  +--rw acdstwamp:periodic-interval    decimal64
+        |        |     |  +--:(acdstwamp:poisson)
+        |        |     |     +--rw acdstwamp:lambda               decimal64
+        |        |     |     +--rw acdstwamp:max-interval?        decimal64
+        |        |     +--ro acdstwamp:state?                     sender-session-state
+        |        |     +--ro acdstwamp:sent-packets?              uint32
+        |        |     +--ro acdstwamp:rcv-packets?               uint32
+        |        |     +--ro acdstwamp:last-sent-seq?             uint32
+        |        |     +--ro acdstwamp:last-rcv-seq?              uint32
+        |        +--rw acdstwamp:session-reflector {session-reflector}?
+        |           +--rw acdstwamp:admin-state?    boolean
+        |           +--rw acdstwamp:refwait?        uint32
+        |           +--ro acdstwamp:test-session
+        |              +--ro acdstwamp:sid?                                 string
+        |              +--ro acdstwamp:sender-ip?                           inet:ip-address
+        |              +--ro acdstwamp:sender-udp-port?                     dynamic-port-number
+        |              +--ro acdstwamp:reflector-ip?                        inet:ip-address
+        |              +--ro acdstwamp:reflector-udp-port?                  inet:port-number
+        |              +--ro acdstwamp:parent-connection-client-ip?         inet:ip-address
+        |              +--ro acdstwamp:parent-connection-client-tcp-port?   inet:port-number
+        |              +--ro acdstwamp:parent-connection-server-ip?         inet:ip-address
+        |              +--ro acdstwamp:parent-connection-server-tcp-port?   inet:port-number
+        |              +--ro acdstwamp:test-packet-dscp?                    inet:dscp
+        |              +--ro acdstwamp:sent-packets?                        uint32
+        |              +--ro acdstwamp:rcv-packets?                         uint32
+        |              +--ro acdstwamp:last-sent-seq?                       uint32
+        |              +--ro acdstwamp:last-rcv-seq?                        uint32
+        +--ro status
+        |  +--ro status?   service-session-status
+        |  +--ro errors
+        |     +--ro error* []
+        |        +--ro tag?   error-tag
+        |        +--ro msg?   string
+        +--rw auto-start?          boolean
+        +---x start
+        +---x stop
+
+  notifications:
+    +---n state-change-event
+       +--ro session-id?   acdt:id
+       +--ro status?       service-session-status
+       +--ro errors
+          +--ro error* []
+             +--ro tag?   error-tag
+             +--ro msg?   string
