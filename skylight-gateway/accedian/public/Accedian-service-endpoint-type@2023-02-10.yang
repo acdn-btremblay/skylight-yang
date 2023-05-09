@@ -38,23 +38,19 @@ module Accedian-service-endpoint-type {
       "Base type for the service endpoints";
   }
 
+  identity generic-endpoint {
+    base service-endpoint;
+    description
+      "This type correspond to a non-specific service-endpoint
+      definition where the endpoint can be identified using only
+      an endpoint-id";
+  }
+
   identity ne-endpoint {
     base service-endpoint;
     description
       "This type correspond to a use case where
       the service endpoint is hosted on a NSO-L3VPN deployment";
-  }
-
-  identity agent-endpoint {
-    base service-endpoint;
-    description
-      "This type correspond to a Sensor Orchestrator endpoint deployment";
-  }
-
-  identity so-endpoint {
-    base service-endpoint;
-    description
-      "This type correspond to a Skylight Orchestrator endpoint `deployment";
   }
 
   typedef service-endpoint-status {
@@ -94,7 +90,10 @@ module Accedian-service-endpoint-type {
 
     uses acdt:error-data {
       description
-        "Present wen the status is in error. Not present otherwise";
+        "The error structure describing the error.
+
+        NOTE:
+        *** Present when service-endpoint-status is set to error. Not present otherwise ***";
     }
   }
 }

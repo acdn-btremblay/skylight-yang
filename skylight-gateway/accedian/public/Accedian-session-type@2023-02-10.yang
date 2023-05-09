@@ -115,7 +115,10 @@ module Accedian-session-type {
 
     uses acdt:error-data {
       description
-        "Present when the status is in error. Not present otherwise";
+        "The error structure describing the error.
+
+        NOTE:
+        *** Present when service-session-status is set to error. Not present otherwise ***";
     }
   }
 }
