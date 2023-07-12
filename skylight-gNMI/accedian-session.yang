@@ -1,0 +1,434 @@
+module accedian-session {
+    
+    yang-version "1";
+    namespace "http://accedian.com/ns/yang/session";
+
+    prefix "accedian";
+
+    organization "Accedian";
+
+    description
+        "This YANG module contains the monitored object definition";
+    
+    revision 2022-10-18 {
+        description
+            "Initial specification";
+        reference "1.0.0";
+    }
+
+    container object-type {
+        description "Monitored Object type";
+        config false;
+        container twamp-sf {
+            container monitored-objects {
+                list monitored-object {
+                    key "monitored-object-id monitored-object-name direction service-id";
+                    uses properties-grouping; 
+                    container location {
+                        container source-location {
+                            uses location-grouping;
+                        }
+                        container destination-location {
+                            uses location-grouping;
+                        }
+                    }
+                    container metrics {
+                        uses metrics-grouping;
+                    }
+                    container meta {
+                        uses meta-grouping;
+                    }
+                    leaf service-id {
+                        type string;
+                        description "Service ID";
+                    }
+                }
+            }
+        }
+    }
+
+    grouping properties-grouping {
+        leaf monitored-object-id {
+            type string;
+            description "Monitored Object unique identifier";
+        }
+        leaf session-id {
+            type string;
+            description "Session ID";
+        }
+        leaf monitored-object-name {
+            type string;
+            description "Monitored object name";
+        }
+        leaf direction {
+            type network-direction;
+            description "Direction";
+        }  
+        leaf-list Topology {
+            type string;
+            description "Topology";
+        }
+    }
+
+    grouping metrics-grouping {
+        leaf bytes-received {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Bytes Received";
+        }
+        leaf delay-avg {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay average";
+        }
+        leaf sync-quality {
+            type int64;
+            description "sync quality";
+        }
+        leaf sync-state {
+            type int64;
+            description "sync state";
+        }
+        leaf delay-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay max";
+        }
+        leaf delay-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay min";
+        }
+        leaf delay-p25 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay p25";
+        }
+        leaf delay-p50 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay P50";
+        }
+        leaf delay-p75 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay P75";
+        }
+        leaf delay-p95 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay P95";
+        }
+        leaf delay-phi {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay PHi";
+        }
+        leaf delay-plo {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay PLo";
+        }
+        leaf delay-pmi {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay PMi";
+        }
+        leaf delay-std-dev-avg {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay standard deviation average";
+        }
+        leaf delay-var-avg {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var avg";
+        }
+        leaf delay-var-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var max";
+        }
+        leaf delay-var-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var min";
+        }
+        leaf delay-var-p25 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var P25";
+        }
+        leaf delay-var-p50 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var P50";
+        }
+        leaf delay-var-p75 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var P75";
+        }
+        leaf delay-var-p95 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var P95";
+        }
+        leaf delay-var-phi {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var PHi";
+        }
+        leaf delay-var-plo {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var PLo";
+        }
+        leaf delay-var-pmi {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Delay var PMi";
+        }
+        leaf duration {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Duration";
+        }
+        leaf ip-tos-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "IP TOS Max";
+        }
+        leaf ip-tos-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "IP TOS Min";
+        }
+        leaf jitter-avg {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter Average";
+        }
+        leaf jitter-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter Max";
+        }
+        leaf jitter-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter Min";
+        }
+        leaf jitter-p25 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter P25";
+        }
+        leaf jitter-p50 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter P50";
+        }
+        leaf jitter-p75 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter P75";
+        }
+        leaf jitter-p95 {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter P95";
+        }
+        leaf jitter-phi {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter PHi";
+        }
+        leaf jitter-plo {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter PLo";
+        }
+        leaf jitter-pmi {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter PMi";
+        }
+        leaf jitter-std-dev {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Jitter Std Dev";
+        }
+        leaf lost-burst-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Lost Burst Max";
+        }
+        leaf lost-burst-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Lost burst min";
+        }
+        leaf mos {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "MOS";
+        }
+        leaf packets-lost {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Packets lost";
+        }
+        leaf packets-lost-pct {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Packets lost pct";
+        }
+        leaf packets-duplicated {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Packets duplicated";
+        }
+        leaf packets-misordered {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Packets misordered";
+        }
+        leaf packets-received {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Packets received";
+        }
+        leaf packets-too-late {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Packets too late";
+        }
+        leaf periods-lost {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "Periods lost";
+        }
+        leaf rvalue {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "RValue";
+        }
+        leaf ttl-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "TTL Max";
+        }
+        leaf ttl-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "TTL Min";
+        }
+        leaf vlan-pbit-min {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "VLAN PBit Min";
+        }
+        leaf vlan-pbit-max {
+            type decimal64 {
+                fraction-digits 5;
+            }
+            description "VLAN PBit Max";
+        }
+    }
+    grouping location-grouping {
+        leaf lat {
+            type decimal64 {
+                fraction-digits 7;
+            }
+            description "latitude";
+        }
+        leaf lon {
+            type decimal64 {
+                fraction-digits 7;
+            }
+            description "longitude";
+        }
+        
+    }
+
+   grouping meta-grouping {
+        list data {
+            key name;
+            leaf name {
+                type string;
+            }
+            leaf val {
+                type string;
+            }
+        }
+    }
+
+    typedef network-direction {
+        type enumeration {
+            enum single {
+                description
+                    "single direction";
+            }
+            enum reverse {
+                description
+                    "reverse direction";
+            }
+            enum bi {
+                description
+                    "bi directional";
+            }
+        }
+    }
+
+}
