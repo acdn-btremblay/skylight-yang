@@ -25,7 +25,8 @@ module Accedian-type {
 
   revision 2023-04-06 {
     description
-      "Change the string pattern of the type id to add the support for the hyphen (-) character";
+      "Change the string pattern of the type id to add the support for the hyphen (-) character.
+      Remove the limitation that prevents the ID from starting with a number.";
   }
 
   revision 2023-02-10 {
@@ -36,13 +37,14 @@ module Accedian-type {
   typedef id {
     type string {
       length "1..128";
-      pattern '[a-zA-Z][a-zA-Z0-9_\-]*';
+      pattern '[a-zA-Z0-9][a-zA-Z0-9_\-]*';
     }
     description
       "An identifier type.
       It is composed of case sensitive ASCII characters.
-      The format starts with a letter as a first character
-      followed by 0 to 127 letter, numbers or underscores";
+      The format starts with a letter or a number as a
+      first character followed by 0 to 127 letter, numbers,
+      underscores and hyphens";
   }
 
   typedef error-tag {
