@@ -67,10 +67,19 @@ module Accedian-service {
       associated service sessions and service endpoints";
 
     leaf service-id {
+      type acdt:id;
       description
         "The service affected by this state change event. It correspond to
         the service-id of one of the services configured";
+
+    }
+
+    leaf group-id {
       type acdt:id;
+      description
+        "The value of the Group ID configured in Accedian-service:services:service:group-id.
+        The value will be present only if the value was configured in the service associated
+        with state-change-event:service-id";
     }
 
     list session-state-change {
@@ -174,10 +183,9 @@ module Accedian-service {
         description
           "An optional group identifier that associates this service to a logical group of
           services. The yang client can associate a service to a group of services by configuring
-          the same group-id in all the services belonging to that group.
-          These groupings can be used to perform operations on all services belonging
-          to a group. It can also be used to register to event stream resources based
-          on the group-id";
+          the same group-id in all the services belonging to that group. These groupings can then
+          be used to perform operations on all services belonging to a group. It can also be used
+          to register to event stream resources based on the group-id";
       }
 
       leaf description {
