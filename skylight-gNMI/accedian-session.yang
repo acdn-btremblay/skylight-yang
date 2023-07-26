@@ -12,8 +12,8 @@ module accedian-session {
     
     revision 2022-10-18 {
         description
-            "Initial specification";
-        reference "1.0.0";
+            "Network Direction Update";
+        reference "1.1.0";
     }
 
     container object-type {
@@ -37,10 +37,6 @@ module accedian-session {
                     }
                     container meta {
                         uses meta-grouping;
-                    }
-                    leaf service-id {
-                        type string;
-                        description "Service ID";
                     }
                 }
             }
@@ -67,6 +63,10 @@ module accedian-session {
         leaf-list Topology {
             type string;
             description "Topology";
+        }
+        leaf service-id {
+            type string;
+            description "Service ID";
         }
     }
 
@@ -416,17 +416,21 @@ module accedian-session {
 
     typedef network-direction {
         type enumeration {
-            enum single {
+            enum -1 {
                 description
-                    "single direction";
+                    "NON: No Direction";
             }
-            enum reverse {
+            enum 0 {
                 description
-                    "reverse direction";
+                    "SD: Source to Destination - metrics with this directionality represents the packet stats seen as they arrive at the destination";
             }
-            enum bi {
+            enum 1 {
                 description
-                    "bi directional";
+                    "DS: Destination to Source - metrics with this directionality represents the packet stats seen starting from the destination back to the source";
+            }
+            enum 2 {
+                description
+                    "RT: Round Trip - metrics with this directionality represent the packet stats seen between the source back to itself";
             }
         }
     }
