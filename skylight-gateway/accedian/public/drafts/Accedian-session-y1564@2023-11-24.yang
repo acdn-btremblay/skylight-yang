@@ -1,0 +1,523 @@
+module Accedian-session-y1564 {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/sat/y1564";
+  prefix acdsy;
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import Accedian-net-type {
+    prefix acdnt;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdstype;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition for the Accedian SAT Y1564 protocol.
+
+    Y.1564 tests support standardized testing for turning up, installing and troubleshooting Ethernet-based
+    services. This Yang file describes the model to set up Y.1564 in order to perform end-to-end Ethernet
+    service activation tests.
+    You can run a Y.1564 test to determine the conformance of a network section or a specific device to a service
+    level agreement (SLA) and/or to meet Ethernet standards. You can define a total of eight flows per
+    test. See the ITU-T Y.1564 standard for the definition of parameters and tests
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Initial revision";
+  }
+
+  typedef measurement-type {
+    type enumeration {
+      enum max-value {
+        description
+          "";
+      }
+      enum average-value {
+        description
+          "";
+      }
+    }
+  }
+
+  typedef frame-size-type {
+    type enumeration {
+      enum fixed {
+        description
+          "Fixed frame size";
+      }
+      enum emix {
+        description
+          "For EMIX, rhe size of the test packets will follow the
+          sequence based on frame sizes a, b, c, d, e, f, g, and u,
+          where: a=64Bytes, b=128Bytes, c=256Bytes, d=512Bytes,
+          e=1024Bytes, f=1280Bytes, g=1518Bytes.
+          u is the user-defined size";
+      }
+    }
+  }
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when 'derived-from-or-self("/acdses:sessions/acdses:session/acdses:session-type", "acdstype:y1564")';
+    description
+      "Augment the service session protocol of Accedian-service-session with SAT
+      config data";
+
+    container y1564 {
+      when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:y1564'";
+      description
+        "";
+
+      // NOT SUPPORTED ON VCX.
+      //"cbs": 0, ON 1G10G only CBS Supported since 7.8
+      //"ebs": 0,
+      //"ooopercentage": 0,
+      //"ooopercentageenable": true,
+
+      // Feature implemented at SO level...
+      // Create reverse OW test automatically in L3.
+      // Won't implement for now.
+      //"groupreversetests": true,
+
+      //"loopback": true,
+      //"onewayreversepath": true,
+
+
+      // VCX IS TWD ONLY
+      // "delaymeasurementtype": "",
+      //"timesyncmandatory": true
+
+      //"servicename": "",
+      //"serviceenable": true,
+      //"serviceid": 0,
+
+      //"meId": 0,
+      //"nearendconnector": "",
+
+      container generator {
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the endpoint will operate as a Y.1564 generator";
+        }
+
+      leaf transport-type {
+      //"remoteunittype": "",
+        type acdnt:transport-type;
+        default layer3;
+        description
+          "";
+      }
+
+      leaf outgoing-port-name {
+        //"outgoingport": "",
+          type acdnt:logical-port;
+          description
+            "Name of the port on which to send the test traffic";
+        }
+
+        container l2 {
+          when "../transport-type = 'layer2'";
+
+          leaf y1731-meg-level {
+          //"meglevel": "",
+            type uint8 {
+              range 0..7;
+            }
+            description
+              "Y.1731 Maintenance Entity Group level";
+          }
+        }
+
+        container l3 {
+          when "../transport-type = 'layer3'";
+
+          leaf generator-udp-port {
+          //"sourceport": 0,
+            type acdnt:source-port-number;
+            description
+              "The UDP port number that is to be used by
+              the sender for this Y.1564 session";
+          }
+
+          leaf dscp {
+          //"peerdscp"
+            type acdnt:dscp;
+            description
+              "The DSCP value present in the IP header of the
+              Y.1564 Test Layer-3 packets";
+          }
+        }
+
+        container configuration-test {
+          description
+            "";
+
+          leaf step-duration {
+          //"configduration": 0,
+          //"configurationenable": true,
+            type uint8 {
+              range 1..60;
+            }
+            default 10;
+            description
+              "Duration of each step during the configuration test in seconds";
+          }
+
+          leaf parallel-test-enable {
+          //"parallelenable": true,
+            type boolean;
+            default true;
+            description
+              "Enable Y.1564 parallel service configuration test";
+          }
+        }
+
+        container performance-test {
+          description
+            "";
+          // NOT supported IN VCX
+          //  "burstslaenable": true,
+
+          leaf test-duration {
+          //"performanceduration": 0,
+          //"performanceenable": true,
+            type uint16 {
+              range 1..1440;
+            }
+            default 15;
+            description
+              "Duration of each step during the performance test in minutes";
+          }
+        }
+
+        list service {
+          key service-name;
+          description
+            "";
+
+          //"servicelist": [],
+
+
+          // SERVICES
+
+          leaf service-name {
+            type string;
+            description
+              "";
+          }
+
+          leaf frame-size-type {
+          //"framesizetype": "",
+            type frame-size-type;
+            default "fixed";
+            description
+              "Packet sizes may be fixed or EMIX. Fixed packet size
+              is specified by the fixed-packet-size field";
+          }
+
+          leaf fixed-packet-size {
+            when "../frame-size-type = 'fixed'";
+            //"packetsize": 0,
+            type uint16 {
+              range 64..10240;
+            }
+            default 512;
+            description
+              "Specify packet size in bytes when size-type is 'fixed'. Maximum packet
+              size is 10240";
+          }
+
+          leaf emix-size-sequence {
+            when "../frame-size-type = 'emix'";
+            //"sequenceofsizes": "",
+            type string;
+            default "bceg";
+            description
+              "Specify the EMIX sequence of packet sizes for the test";
+          }
+
+          leaf emix-user-packet-size {
+            when "../frame-size-type = 'emix'";
+            //"userpacketsize": 0,
+            type uint16;
+            default 2000;
+            description
+              "For a user-defined packet (u), specify the packet size";
+          }
+
+          leaf cir {
+          //"cir": 0,
+            type uint16 {
+              range 1..1000;
+            }
+            default 10;
+            description
+              "Committed information rate in Mbps";
+          }
+
+          leaf eir {
+          //"eir": 0,
+            type uint16 {
+              range 1..10000;
+            }
+            default 3;
+            description
+              "Excess information rate in Mbps";
+          }
+
+          leaf fdv {
+          // CHECK ME. TYPE AND DEFAULT.
+          //"fdv": 0,
+            type uint32;
+            default 1000;
+            description
+              "Maximum/average two-way Frame Delay Variation (FDV)
+              allowed (in micro-seconds)";
+          }
+
+          leaf fdv-type {
+          //"fdvtype": "",
+            type measurement-type;
+            default max-value;
+            description
+              "Determines whether the Frame Transfer Delay (FTD) parameter
+              is a maximum or average value";
+          }
+
+          leaf flr {
+          //"flr": 0,
+          // CHECK ME. TYPE AND DEFAULT.
+          // CHECK ME... THIS IS A FRACTION
+            type uint32;
+            // DEFAULT IS 0.000001%
+            default 1000;
+            description
+              "Maximum Frame Loss Ratio (FLR) allowed";
+          }
+
+          leaf ftd {
+          // CHECK ME. TYPE AND DEFAULT.
+          //"ftd": 0,
+            type uint32;
+            default 5000;
+            description
+              "Maximum/average two-way Frame Transfer Delay (FTD) allowed
+              (in micro-seconds)";
+          }
+
+          leaf ftd-type {
+          //"ftdtype": "",
+            type measurement-type;
+            default "max-value";
+            description
+              "Determines whether the Frame Transfer Delay (FTD) parameter
+              is a maximum or average value";
+          }
+
+          leaf m-factor {
+          // CHECK ME. TYPE AND DEFAULT.
+          //"mfactor": 0,
+            type uint32;
+            default 1;
+            description
+              "The M factor is added to the Service Acceptance Criteria in the
+              policing test to take into account the effect of the CBS and EBS
+              on the total rate. The policing test will pass if IR-T=<CIR+EIR+M
+              Where: IR-T: Total Information Rate
+              CIR: Committed Information Rate
+              EIR: Excess Information Rate
+              M: M factor (default value = 1 Mbps)";
+          }
+
+          leaf availability {
+          //  "availability": true,
+            type boolean;
+            default false;
+            description
+              "When set to true, enable Availability measurement";
+          }
+
+          leaf policing {
+          //"policingenable": true,
+            type boolean;
+            default true;
+            description
+              "When set to true, enable policing testing";
+          }
+
+          leaf step-load {
+          //"steploadenable": true,
+            type boolean;
+            default false;
+            description
+              "When set to true, enable step testing";
+          }
+
+          list vlan {
+          //"enablevlan1": true,
+          //"enablevlan2": true,
+          //"vlan1cfi": 0,
+          //"vlan1ethertype": "",
+          //"vlan1id": 0,
+          //"vlan1priority": 0,
+          //"vlan2cfi": 0,
+          //"vlan2ethertype": "",
+          //"vlan2id": 0,
+          //"vlan2priority": 0
+            key id;
+            max-elements 2;
+            uses acdnt:vlan-config;
+            description
+              "";
+          }
+
+          // SO specific stuff to emulate a two way by configuring generator+peer also as peer+generator
+          //list remote-vlan {
+          //"remoteenablevlan1": true,
+          //"remoteenablevlan2": true,
+          //"remotevlan1cfi": 0,
+          //"remotevlan1ethertype": "",
+          //"remotevlan1id": 0,
+          //"remotevlan1priority": 0,
+          //"remotevlan2cfi": 0,
+          //"remotevlan2ethertype": "",
+          //"remotevlan2id": 0,
+          //"remotevlan2priority": 0,
+          //            key id;
+          //            max-elements 2;
+          //            uses acdnt:vlan-config;
+          //            description
+          //              "";
+          // }
+
+          container override-peer-config {
+
+          //"farendconnector": "",
+          //"incomingport": "",
+
+          //"remoteunitdscp": "",
+          //"remoteunitme": "",
+          //"sourceip": "",
+
+            container l2 {
+              when "../../../transport-type = 'layer2'";
+
+              leaf peer-mac-address {
+              //"destinationmac": "",
+                type yang:mac-address;
+                description
+                  "";
+              }
+
+              leaf y1731-meg-level {
+              //"meglevel": 0,
+                type uint8 {
+                  range 0..7;
+                }
+                description
+                  "Y.1731 Maintenance Entity Group level";
+              }
+
+            }
+
+            container l3 {
+              when "../../../transport-type = 'layer3'";
+              description
+                "";
+
+              leaf peer-ip {
+              //"destinationmac": "",
+                type inet:ip-address;
+                description
+                  "The IPv4 or IPv6 peer address";
+              }
+
+              leaf dscp {
+              //"remoteunitdscp": "",
+                type acdnt:dscp;
+                description
+                  "The DSCP value present in the IP header of the
+                  Y.1564 Test Layer-3 packets";
+              }
+            }
+          }
+        }
+      }
+
+
+      container peer {
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the endpoint will operate as a Y.1564 peer";
+        }
+
+        container l2 {
+          when "../../generator/transport-type = 'layer2'";
+
+          leaf peer-mac-address {
+          //"destinationmac": "",
+            type yang:mac-address;
+            description
+              "";
+          }
+        }
+
+        container l3 {
+          when "../../generator/transport-type = 'layer3'";
+          description
+            "";
+
+          leaf peer-ip {
+          //"peerdestinationip": "",
+            type inet:ip-address;
+            description
+              "The IPv4 or IPv6 peer address";
+          }
+
+          leaf peer-udp-port {
+          //"destinationport": 0,
+            type inet:port-number;
+            description
+              "This parameter defines the destination UDP port number
+              expected by the peer for this Layer-3 SAT session";
+          }
+        }
+      }
+    }
+  }
+}
+

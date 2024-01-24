@@ -1,0 +1,469 @@
+module Accedian-session-rfc2544 {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/sat/rfc2544";
+  prefix acdsr;
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import Accedian-net-type {
+    prefix acdnt;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdstype;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "This module contains the definition for the Accedian RFC 2544 protocol.
+
+    You can use the RFC 2544 traffic generator to create a flow of test traffic and produce test results. The traffic
+    generator allows you to set characteristics, such as the traffic type and bit rate, when you define a
+    flow. You can also set the following parameters when setting up a traffic flow:
+
+    Traffic Type: Layer 2, Layer 3 or IP multicast traffic.
+    Test Traffic Encapsulation Type: VLAN or VLAN-in-VLAN
+    Frame/Packet Sizes: All sizes defined in the RFC-2544 standard, plus Jumbo
+
+    See the RFC-2544 standard for a definition of all parameters and tests.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2023-11-24 {
+    description
+      "Initial revision";
+  }
+
+  typedef frame-size {
+    description
+      "Frame size in bytes";
+    type union {
+      type uint16 {
+        range "64 | 128 | 256 | 512 | 1024 | 1280 | 1518";
+      }
+      type enumeration {
+        enum "jumbo" {
+          description
+            "Frame size specified by the the value of the test-config:jumbo-frame-size field";
+        }
+      }
+    }
+  }
+
+  typedef duration-sec {
+    type uint16 {
+      range 1..1800;
+    }
+    default 60;
+    description
+      "Duration of the test in seconds";
+  }
+
+  typedef duration-msec {
+    type uint16 {
+      range 1..10000;
+    }
+    default 2000;
+    description
+      "Duration of the test in milliseconds";
+  }
+
+  typedef frameloss {
+    type uint16 {
+      range 0..999;
+    }
+    default 0;
+    description
+      "Acceptable difference between measured frame loss (0.1%)";
+  }
+
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when 'derived-from-or-self("/acdses:sessions/acdses:session/acdses:session-type", "acdstype:rfc2544")';
+    description
+      "Augment the service session protocol of Accedian-service-session with SAT RFC2544
+      config data";
+
+    container rfc2544 {
+
+    // Not needed... name and desc already in Accedian-session.yang
+    //"suitedesc": "",
+    //"suitename": "",
+
+    // ???? Needed in yang or convertion to meID needed? Try to find in doc
+    //"nearendconnector": "",
+    //"nearendport": "",
+    //"remoteunitconnector": "",
+    //"remoteunitme": "",
+    //"remoteunitport": "",
+
+
+
+    // GENERATOR
+      container generator {
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the endpoint will operate as a RFC2544 generator";
+        }
+
+        leaf transport-type {
+        //"peertype": "",
+          type acdnt:transport-type;
+          default layer3;
+          description
+            "";
+        }
+
+        leaf outgoing-port-name {
+          type acdnt:logical-port;
+          description
+            "";
+        }
+
+        container layer2 {
+          when "../transport-type = 'layer2'";
+
+          leaf y1731-meg-level {
+          //"meglevel": "",
+            type uint8 {
+              range 0..7;
+            }
+            description
+              "Y.1731 Maintenance Entity Group level";
+          }
+        }
+
+        container layer3 {
+          when "../transport-type = 'layer3'";
+
+          leaf generator-ip {
+          //"peersourceip": "",
+            type inet:ip-address;
+            description
+              "The IP address of the Session-Sender device.
+              If not specified, the packets will be sent using
+              the sender local network configuration";
+          }
+
+          leaf generator-udp-port {
+          //"sourceport": 0,
+            type acdnt:source-port-number;
+            description
+              "The UDP port number that is to be used by
+              the sender for this RFC2544 session";
+          }
+
+          leaf dscp {
+          //"peerdscp"
+            type acdnt:dscp;
+            description
+              "The DSCP value present in the IP header of the
+              RFC2544 Test Layer-3 packets";
+          }
+
+          leaf ttl {
+          //"? Not there ? It's not in SO UI or REST",
+            type acdnt:ttl;
+            description
+              "The Time To Live value present in the IP header of
+              the RFC2544 Test Layer-3 packets";
+          }
+        }
+
+        list vlan {
+          key id;
+          max-elements 2;
+          uses acdnt:vlan-config;
+          description
+            "";
+        }
+
+        container test-config {
+
+        // GENERAL
+          leaf jumbo-frame-size {
+          //"jumboframesize": 0,
+            type uint16 {
+              range 64..10240;
+            }
+            default 2000;
+            description
+              "Size of the jumbo frames";
+          }
+
+          leaf binary-duration {
+          //"binaryduration": 0,
+            type uint8 {
+              range 1..10;
+            }
+            default 2;
+            description
+              "Duration in seconds of each trial during the binary search for the maximum
+              throughput";
+          }
+
+          leaf strict-failure {
+          //"strictfailure": true,
+
+            type boolean;
+            default false;
+            description
+              "When set to true, the test will fail on duplicates or out of order packets";
+          }
+
+          leaf exclude-vlan-size {
+          //"excludevlansize": true,
+            type boolean;
+            default false;
+            description
+              "When set to true, the frame length is increased by the size of the VLAN tag
+              header(s) being added to the frame";
+          }
+
+          // TODO. Needed? Need to check what is the content of the report when set to true...
+          //leaf verbose-report {
+          //"verbosereport": true,
+          //type boolean;
+          //default false;
+          //description
+          //  "When set to true, display all attempts in report file";
+          //}
+
+          // THROUGHPUT
+          container throughput {
+            description
+              "Throughput test settings";
+
+            leaf step-size {
+            //"tptstepsize": 0,
+              type uint32;
+              default 5;
+              description
+                "Granularity of the min-max range";
+            }
+
+            leaf minimum-rate {
+            //"tptminrate": 0,
+              type uint32;
+              default 1;
+              description
+                "Minimum rate in Mbps";
+            }
+            leaf maximum-rate {
+            //"tptmaxrate": 0,
+              type uint32;
+              default 100;
+              description
+                "Maximum rate in Mbps";
+            }
+
+            leaf fine-stepping {
+            //"tptfinestepping": true,
+              type boolean;
+              default false;
+              description
+                "Enable fine stepping in case of low bandwidth testing (below
+                12Mbps)";
+            }
+
+            leaf duration {
+            //"tptduration": 0,
+              type duration-sec;
+              description
+                "Duration of the test in seconds";
+            }
+
+            leaf frameloss {
+            //"tptframeloss": 0,
+              type frameloss;
+              description
+                "Acceptable difference between measured frame loss (0.1%)";
+            }
+
+            leaf-list frame-size {
+            //"tptframesize": "",
+              type frame-size;
+              max-elements 8;
+              default 64;
+              description
+                "Frame sizes to use. Any combination is valid";
+            }
+          }
+
+          // FRAMELOSS
+          container frameloss {
+            description
+              "Frameloss test settings";
+            //      "flduration": 0,
+            leaf duration {
+              type duration-sec;
+              description
+                "Duration of the test in seconds";
+            }
+
+            leaf-list frame-size {
+            //      "flframesize": "",
+              type frame-size;
+              max-elements 8;
+              default 64;
+              description
+                "Frame sizes to use. Any combination is valid";
+            }
+
+            //      "flstepsize": 0,
+            leaf step-size {
+              type uint16 {
+                range 1..5000;
+              }
+              default 5;
+              description
+                "Granularity of the min-max range";
+            }
+            //      "framelossenable": true,
+          }
+
+          // DELAY VARIATION
+          container delay-variation {
+            description
+              "Delay and delay variation test settings";
+
+            //"delayduration": 0,
+            leaf duration {
+              type duration-sec;
+              description
+                "Duration of the test in seconds";
+            }
+            //"delayframeloss": 0,
+            leaf frameloss {
+              type frameloss;
+              description
+                "Acceptable difference between measured frame loss (0.1%)";
+            }
+
+            leaf-list frame-size {
+            //"delayframesize": "",
+              type frame-size;
+              max-elements 8;
+              default 64;
+              description
+                "Frame sizes to use. Any combination is valid";
+            }
+
+            //"delayenable": true,
+          }
+
+          // BACK TO BACK
+          container back-to-back {
+            description
+              "Back-to-back test settings";
+
+            leaf-list frame-size {
+            //"b2bframesize": "",
+              type frame-size;
+              max-elements 8;
+              default 64;
+              description
+                "Frame sizes to use. Any combination is valid";
+            }
+
+            //"b2brepeat": 0,
+            leaf repeat {
+              type uint8 {
+                range 1..100;
+              }
+              default 50;
+              description
+                "Number of bursts to perform for each packet size";
+            }
+
+            //"b2bduration": 0,
+            leaf duration {
+              type duration-msec;
+              description
+                "Duration of the test in milliseconds";
+            }
+            //"b2benable": true,
+          }
+        }
+      }
+
+      // RECEIVER
+      container peer {
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the endpoint will operate as a RFC2544 peer";
+        }
+
+        container layer2 {
+          when "../../generator/transport-type = 'layer2'";
+
+          leaf peer-mac-address {
+          //"destinationmac": "",
+            type yang:mac-address;
+            description
+              "";
+          }
+        }
+
+        container layer3 {
+          when "../../generator/transport-type = 'layer3'";
+          description
+            "";
+
+          leaf peer-ip {
+          //"peerdestinationip": "",
+            type inet:ip-address;
+            description
+              "The IPv4 or IPv6 peer address";
+          }
+
+          leaf peer-udp-port {
+          //"destinationport": 0,
+            type inet:port-number;
+            description
+              "This parameter defines the destination UDP port number
+              expected by the peer for this Layer-3 SAT session";
+          }
+
+          leaf two-way-loopback {
+          //"l3twloopback": true,
+            type boolean;
+            default false;
+            description
+              "When set to true, enable Layer-3 two-way loopback tests in the peer";
+          }
+        }
+      }
+    }
+  }
+}
+

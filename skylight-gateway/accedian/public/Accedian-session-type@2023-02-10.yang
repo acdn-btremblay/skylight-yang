@@ -38,12 +38,6 @@ module Accedian-session-type {
   }
 
 
-  identity twamp {
-    base session;
-    description
-      "The type representing a Accedian TWAMP session as per RFC8040";
-  }
-
   identity twamp-light {
     base session;
     description
@@ -80,6 +74,18 @@ module Accedian-session-type {
     description
       "The type representing a Accedian Y1564 session";
   }
+
+  typedef capability-value {
+    description
+      "The value associated with each capability key. The value depends on the key. The value type
+      is provided in the key description in each session type capability files";
+    type union {
+      type int32;
+      type boolean;
+      type string;
+    }
+  }
+
 
   typedef service-session-status {
     description
