@@ -1,0 +1,227 @@
+-------------------------------------------
+### Create endpoint A of type ssc-endpoint (Skylight Sensor Control)
+### Create endpoint B of type unmanaged
+### POST {+restconf}/data/Accedian-service-endpoint:service-endpoints
+{
+  "Accedian-service-endpoint:service-endpoint": [
+    {
+      "endpoint-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+      "description": "Site-A Session sender",
+      "type": "Accedian-service-endpoint-type:ssc-endpoint",
+      "config": {
+        "Accedian-service-endpoint-ssc:ssc-config": {
+          "interface-id": "pe1",
+          "sensor-control-id": "43217225-0dca-4328-b15b-7eb0823f4cf9"
+        }
+      }
+    },
+    {
+      "endpoint-id": "8ab84b4a-e2f0-4233-b976-0cbf70507a65",
+      "description": "Site-B Session reflector",
+      "type": "Accedian-service-endpoint-type:unmanaged-endpoint"
+      }
+    }
+  ]
+}
+
+-------------------------------------------
+### Create a minimalistic (all defaults) TWAMP light session between endpoint A and B
+### POST {+restconf}/data/Accedian-session:sessions
+{
+  "Accedian-session:session": [
+    {
+      "session-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+      "description": "A twamp light session without control between Site-A and Site-B",
+      "session-type": "Accedian-session-type:twamp-light",
+      "service-endpoints": [
+        {
+          "endpoint-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+          "session-protocol": {
+            "Accedian-session-twamp-light:twamp-light": {
+              "session-sender": {
+                "admin-state": true,
+                "reflector-ip": "10.1.2.3",
+            }
+          }
+        },
+        {
+          "endpoint-id": "8ab84b4a-e2f0-4233-b976-0cbf70507a65",
+          "session-protocol": {
+            "Accedian-session-twamp-light:twamp-light": {
+              "session-reflector": {
+                "admin-state": true
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
+-------------------------------------------
+-------------------------------------------
+### Create endpoint A of type ssc-endpoint (Skylight Sensor Control)
+### Create endpoint C also of type SSC.
+### POST {+restconf}/data/Accedian-service-endpoint:service-endpoints
+{
+  "Accedian-service-endpoint:service-endpoint": [
+    {
+      "endpoint-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+      "description": "Site-A Session sender",
+      "type": "Accedian-service-endpoint-type:ssc-endpoint",
+      "config": {
+        "Accedian-service-endpoint-ssc:ssc-config": {
+          "interface-id": "pe1",
+          "sensor-control-id": "43217225-0dca-4328-b15b-7eb0823f4cf9"
+        }
+      }
+    },
+    {
+      "endpoint-id": "babd4b4a-e2f0-4233-b976-0cbf70507a65",
+      "description": "Site-B Session reflector",
+      "type": "Accedian-service-endpoint-type:ssc-endpoint",
+      "config": {
+        "Accedian-service-endpoint-ssc:ssc-config": {
+          "interface-id": "pe2",
+          "sensor-control-id": "56787225-0dca-4328-b15b-7eb0823f4cf9"
+        }
+      }
+    }
+  ]
+}
+
+
+### Example of a TWAMP light session between endpoint A and C. All fields, no default.
+### POST {+restconf}/data/Accedian-session:sessions
+{
+  "Accedian-session:session": [
+    {
+      "session-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+      "description": "A twamp light session without control between Site-A and Site-B",
+      "session-type": "Accedian-session-type:twamp-light",
+      "service-endpoints": [
+        {
+          "endpoint-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+          "session-protocol": {
+            "Accedian-session-twamp-light:twamp-light": {
+              "session-sender": {
+                "admin-state": true,
+                "sender-ip": "192.168.2.1",
+                "sender-udp-port": 14000,
+                "reflector-ip": "192.168.2.2",
+                "reflector-udp-port": 862,
+                "report-interval": 60,
+                "reflector-latency-subtraction": false,
+                "test-packets": {
+                  "number-of-packets": 10000,
+                  "payload-size": 120,
+                  "rate": 2,
+                  "dscp": 0,
+                  "ttl": 10,
+                  "vlan-priority": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "endpoint-id": "babd4b4a-e2f0-4233-b976-0cbf70507a65",
+          "session-protocol": {
+            "Accedian-session-twamp-light:twamp-light": {
+              "session-reflector": {
+                "admin-state": true,
+                "reflector-udp-port": 862,
+                "mode": "stateful"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
+-------------------------------------------
+-------------------------------------------
+### Create endpoint A of type ssc-endpoint (Skylight Sensor Control)
+### Create endpoint D of type ne-endpoint
+### POST {+restconf}/data/Accedian-service-endpoint:service-endpoints
+{
+  "Accedian-service-endpoint:service-endpoint": [
+    {
+      "endpoint-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+      "description": "Site-A Session sender",
+      "type": "Accedian-service-endpoint-type:ssc-endpoint",
+      "config": {
+        "Accedian-service-endpoint-ssc:ssc-config": {
+          "interface-id": "pe1",
+          "sensor-control-id": "43217225-0dca-4328-b15b-7eb0823f4cf9"
+        }
+      }
+    },
+    {
+      "endpoint-id": "7079da2a-a053-4f3d-b414-5576b66c8641",
+      "description": "Site-D Session reflector",
+      "type": "Accedian-service-endpoint-type:ne-endpoint",
+      "config": {
+        "Accedian-service-endpoint-ne:ne-config": {
+          "ne-id": "pe2",
+          "vlan-id": "123",
+          "ip": "192.168.2.2"
+        }
+      }
+    }
+  ]
+}
+
+-------------------------------------------
+### Other example of TWAMP light session between endpoint A and D. All fields, no default.
+### POST {+restconf}/data/Accedian-session:sessions
+{
+  "Accedian-session:session": [
+    {
+      "session-id": "abd15c25-e466-41ff-a02b-9abc2061142b",
+      "description": "A twamp light session without control between Site-A and Site-B",
+      "session-type": "Accedian-session-type:twamp-light",
+      "service-endpoints": [
+        {
+          "endpoint-id": "02597225-0dca-4328-b15b-7eb0823f4cf9",
+          "session-protocol": {
+            "Accedian-session-twamp-light:twamp-light": {
+              "session-sender": {
+                "admin-state": true,
+                "sender-ip": "192.168.2.1",
+                "sender-udp-port": 14000,
+                "reflector-ip": "192.168.2.2",
+                "reflector-udp-port": 862,
+                "report-interval": 60,
+                "reflector-latency-subtraction": false,
+                "test-packets": {
+                  "number-of-packets": 10000,
+                  "payload-size": 120,
+                  "rate": 2,
+                  "dscp": 0,
+                  "ttl": 10,
+                  "vlan-priority": 0
+                }
+              }
+            }
+          }
+        },
+        {
+          "endpoint-id": "7079da2a-a053-4f3d-b414-5576b66c8641",
+          "session-protocol": {
+            "Accedian-session-twamp-light:twamp-light": {
+              "session-reflector": {
+                "admin-state": true,
+                "reflector-udp-port": 862,
+                "mode": "stateful"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

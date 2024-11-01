@@ -1,0 +1,1030 @@
+diff --git a/accedian/public/Accedian-alert-metric@2024-08-31.yang b/accedian/public/Accedian-alert-metric@2024-08-31.yang
+index cebe9e1..3954cac 100644
+--- a/accedian/public/Accedian-alert-metric@2024-08-31.yang
++++ b/accedian/public/Accedian-alert-metric@2024-08-31.yang
+@@ -154,7 +154,7 @@ module Accedian-alert-metric {
+ 
+     leaf ratio {
+       type uint8 {
+-        range 0..100;
++        range "0..100";
+       }
+       default 100;
+       description
+@@ -164,7 +164,7 @@ module Accedian-alert-metric {
+   }
+ 
+   augment "/acdal:alert-policies/acdal:alert-policy/acdal:policy" {
+-    when "/acdal:alert-policies/alert-policy/acdal:policy-type = 'acdalt:metric'";
++    when "derived-from-or-self(/acdal:alert-policies/acdal:alert-policy/acdal:policy-type, 'acdalt:metric')";
+     description
+       "Augment the alerts with a conditional policy that allow to trigger
+       an alert based on specific conditions applied to metric based data";
+diff --git a/accedian/public/Accedian-alert-type@2024-08-31.yang b/accedian/public/Accedian-alert-type@2024-08-31.yang
+index b868180..590cc0d 100644
+--- a/accedian/public/Accedian-alert-type@2024-08-31.yang
++++ b/accedian/public/Accedian-alert-type@2024-08-31.yang
+@@ -32,18 +32,11 @@ module Accedian-alert-type {
+     description
+       "The base type identifying a Accedian alert policy";
+   }
+-
+-
++    
+   identity metric {
+     base alert-policy;
+     description
+-      "";
+-  }
+-
+-  identity logical {
+-    base alert-policy;
+-    description
+-      "";
++      "Alerts policies based on metric values and constraints";
+   }
+ 
+   typedef alert-severity {
+diff --git a/accedian/public/Accedian-alert@2024-08-31.yang b/accedian/public/Accedian-alert@2024-08-31.yang
+index 1ee97ed..f837a59 100644
+--- a/accedian/public/Accedian-alert@2024-08-31.yang
++++ b/accedian/public/Accedian-alert@2024-08-31.yang
+@@ -65,7 +65,7 @@ module Accedian-alert {
+ 
+       leaf description {
+         type string {
+-          length 0..512;
++          length "0..512";
+         }
+         description
+           "A description of the policy";
+@@ -82,7 +82,8 @@ module Accedian-alert {
+ 
+       container policy {
+         description
+-          "";
++          "Policy-type specific configuration data. It is Implemented as a
++          Yang augment mount point";
+       }
+     }
+   }
+diff --git a/accedian/public/Accedian-net-type@2023-11-24.yang b/accedian/public/Accedian-net-type@2023-11-24.yang
+index 65658b0..9b08e25 100644
+--- a/accedian/public/Accedian-net-type@2023-11-24.yang
++++ b/accedian/public/Accedian-net-type@2023-11-24.yang
+@@ -38,24 +38,24 @@ module Accedian-net-type {
+ 
+   typedef transport-type {
+     description
+-      "";
++      "OSI Model layer";
+     type enumeration {
+       enum "layer2" {
+         description
+-          "";
++          "OSI Model Data Link Layer";
+       }
+       enum "layer3" {
+         description
+-          "";
++          "OSI Model Network Layer";
+       }
+     }
+   }
+-    
++
+   typedef vlan-id {
+     description
+       "A 12-bit field specifying the VLAN identifier of the frame. Values 0 and 4095 are reserved";
+     type uint16 {
+-      range 1..4094;
++      range "1..4094";
+     }
+   }
+ 
+@@ -84,7 +84,7 @@ module Accedian-net-type {
+     description
+       "A 1 bit field indicating a DEI/CFI value";
+     type uint8 {
+-      range 0..1;
++      range "0..1";
+     }
+     default 0;
+   }
+@@ -93,7 +93,7 @@ module Accedian-net-type {
+     description
+       "A 3 bits field indicating the frame priority level";
+     type uint8 {
+-      range 0..7;
++      range "0..7";
+     }
+     default 0;
+   }
+@@ -126,7 +126,7 @@ module Accedian-net-type {
+ 
+   typedef ttl {
+     type uint8 {
+-      range 0..255;
++      range "0..255";
+     }
+     default 255;
+     description
+@@ -134,6 +134,14 @@ module Accedian-net-type {
+       the packet";
+   }
+ 
++  typedef y1731-meg-level {
++    type uint8 {
++      range "0..7";
++    }
++    default 7;
++    description
++      "Y.1731 Maintenance Entity Group level";
++  }
+ 
+   grouping vlan-config {
+     description
+diff --git a/accedian/public/Accedian-sat-capabilities@2024-08-31.yang b/accedian/public/Accedian-sat-capabilities@2024-08-31.yang
+index 563c6b6..58ed019 100644
+--- a/accedian/public/Accedian-sat-capabilities@2024-08-31.yang
++++ b/accedian/public/Accedian-sat-capabilities@2024-08-31.yang
+@@ -37,8 +37,7 @@ module Accedian-sat-capabilities {
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-capabilities" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-type = 'acdst:sat'" {
+-
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-type, 'acdst:sat')" {
+       description
+         "Augment Accedian service-endpoint capabilities with SAT specific capabilities";
+     }
+@@ -59,12 +58,12 @@ module Accedian-sat-capabilities {
+             is described in the following enumeration";
+ 
+           type enumeration {
+-            enum "RFC2544" {
++            enum "rfc2544" {
+               description
+                 "Boolean key to indicate if the endpoint can perform SAT tests using RFC2544";
+             }
+ 
+-            enum "ITU-Y.1564" {
++            enum "y1564" {
+               description
+                 "Boolean key to indicate if the endpoint can perform SAT tests using ITU-Y.1564";
+             }
+diff --git a/accedian/public/Accedian-sat@2024-08-31.yang b/accedian/public/Accedian-sat@2024-08-31.yang
+index 1ad3950..5b038f8 100644
+--- a/accedian/public/Accedian-sat@2024-08-31.yang
++++ b/accedian/public/Accedian-sat@2024-08-31.yang
+@@ -1,7 +1,7 @@
+ module Accedian-sat {
+   yang-version 1.1;
+   namespace "http://accedian.com/ns/yang/session/sat";
+-  prefix acdsc;
++  prefix acds;
+ 
+   organization
+     "Accedian Networks Inc.";
+@@ -31,13 +31,13 @@ module Accedian-sat {
+   typedef report-data {
+     type string;
+     description
+-      "";
++      "The report data as a single continuous string";
+   }
+ 
+   typedef report-name {
+     type string;
+     description
+-      "";
++      "The name of a SAT report";
+   }
+ 
+   rpc get-available-reports {
+@@ -96,20 +96,20 @@ module Accedian-sat {
+ 
+   rpc delete-report {
+     description
+-      "";
++      "A remote procedure call that can be used to delete a report";
+     input {
+       leaf report-name {
+         type report-name;
+         mandatory true;
+         description
+-          "";
++          "The name of the report to delete";
+       }
+ 
+       leaf session-id {
+         type string;
+         mandatory true;
+         description
+-          "";
++          "The session-id of the report to delete";
+       }
+     }
+   }
+diff --git a/accedian/public/Accedian-service-endpoint-ne@2024-08-31.yang b/accedian/public/Accedian-service-endpoint-ne@2024-08-31.yang
+index beccaa2..49077ec 100644
+--- a/accedian/public/Accedian-service-endpoint-ne@2024-08-31.yang
++++ b/accedian/public/Accedian-service-endpoint-ne@2024-08-31.yang
+@@ -60,9 +60,9 @@ module Accedian-service-endpoint-ne {
+       "Initial revision";
+   }
+ 
+-  augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type = 'acdsept:ne-endpoint'" {
+ 
++  augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:ne-endpoint')" {
+       description
+         "Augment Accedian service-endpoint data with NE support";
+     }
+diff --git a/accedian/public/Accedian-service-endpoint-nid@2023-11-24.yang b/accedian/public/Accedian-service-endpoint-nid@2023-11-24.yang
+index 87e23c8..d60a9b4 100644
+--- a/accedian/public/Accedian-service-endpoint-nid@2023-11-24.yang
++++ b/accedian/public/Accedian-service-endpoint-nid@2023-11-24.yang
+@@ -50,8 +50,7 @@ module Accedian-service-endpoint-nid {
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type = 'acdsept:nid-endpoint'" {
+-
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:nid-endpoint')" {
+       description
+         "Augment Accedian service-endpoint data with NID endpoint support";
+     }
+diff --git a/accedian/public/Accedian-service-endpoint-ssc@2023-11-24.yang b/accedian/public/Accedian-service-endpoint-ssc@2023-11-24.yang
+index 3275cbc..968bfee 100644
+--- a/accedian/public/Accedian-service-endpoint-ssc@2023-11-24.yang
++++ b/accedian/public/Accedian-service-endpoint-ssc@2023-11-24.yang
+@@ -43,8 +43,7 @@ module Accedian-service-endpoint-ssc {
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type = 'acdsept:ssc-endpoint'" {
+-
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:ssc-endpoint')" {
+       description
+         "Augment Accedian service-endpoint data with Skylight Sensor Control (SSC) support";
+     }
+diff --git a/accedian/public/Accedian-service-endpoint-type@2023-11-24.yang b/accedian/public/Accedian-service-endpoint-type@2023-11-24.yang
+index 0eb76f4..3df2d53 100644
+--- a/accedian/public/Accedian-service-endpoint-type@2023-11-24.yang
++++ b/accedian/public/Accedian-service-endpoint-type@2023-11-24.yang
+@@ -89,19 +89,19 @@ module Accedian-service-endpoint-type {
+       "Defines the different status that can apply to a service endpoint";
+ 
+     type enumeration {
+-      enum "Ready" {
++      enum "ready" {
+         description
+           "The endpoint is configured and ready to perform actions such as
+           starting a session";
+       }
+ 
+-      enum "NotReady" {
++      enum "not-ready" {
+         description
+           "The service-endpoint is still in transition toward a Ready state. It is
+           not in error but it cannot yet perform session actions";
+       }
+ 
+-      enum "Error" {
++      enum "error" {
+         description
+           "The service-endpoint is currently in error state. It cannot currently perform
+           actions such as starting a session";
+diff --git a/accedian/public/Accedian-service-endpoint-unmanaged@2023-11-24.yang b/accedian/public/Accedian-service-endpoint-unmanaged@2023-11-24.yang
+index e2fff32..16857e1 100644
+--- a/accedian/public/Accedian-service-endpoint-unmanaged@2023-11-24.yang
++++ b/accedian/public/Accedian-service-endpoint-unmanaged@2023-11-24.yang
+@@ -37,8 +37,7 @@ module Accedian-service-endpoint-unmanaged {
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type = 'acdsept:unmanaged-endpoint'" {
+-
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:unmanaged-endpoint')" {
+       description
+         "Unmanaged service-endpoint definition";
+     }
+diff --git a/accedian/public/Accedian-service@2024-08-31.yang b/accedian/public/Accedian-service@2024-08-31.yang
+index db12542..3d5287b 100644
+--- a/accedian/public/Accedian-service@2024-08-31.yang
++++ b/accedian/public/Accedian-service@2024-08-31.yang
+@@ -214,7 +214,7 @@ module Accedian-service {
+         description
+           "The service deployment type";
+         reference
+-          "supported types are specified in Accedian-service-type.yang";
++          "Supported types are specified in Accedian-service-type.yang";
+       }
+ 
+       container service-definition {
+diff --git a/accedian/public/Accedian-session-rfc2544@2024-08-31.yang b/accedian/public/Accedian-session-rfc2544@2024-08-31.yang
+index 1d41480..7253735 100644
+--- a/accedian/public/Accedian-session-rfc2544@2024-08-31.yang
++++ b/accedian/public/Accedian-session-rfc2544@2024-08-31.yang
+@@ -78,9 +78,22 @@ module Accedian-session-rfc2544 {
+     }
+   }
+ 
++  typedef step-size {
++    type uint16 {
++      range "1..5000";
++    }
++    units megabits-per-second;
++    default 5;
++    description
++      "Granularity of the min-max range.
++      Note: The step-size config must be smaller or equal to the
++      maximum-rate value. For example, a 5000 Mbps (5Gbps) step size
++      will return a configuration error on a 1Gbps port/device";
++  }
++
+   typedef duration-sec {
+     type uint16 {
+-      range 1..1800;
++      range "1..1800";
+     }
+     units seconds;
+     default 60;
+@@ -90,7 +103,7 @@ module Accedian-session-rfc2544 {
+ 
+   typedef duration-msec {
+     type uint16 {
+-      range 1..10000;
++      range "1..10000";
+     }
+     units milliseconds;
+     default 2000;
+@@ -100,7 +113,7 @@ module Accedian-session-rfc2544 {
+ 
+   typedef frameloss {
+     type uint16 {
+-      range 0..999;
++      range "0..999";
+     }
+     units percentage;
+     default 0;
+@@ -110,7 +123,7 @@ module Accedian-session-rfc2544 {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:rfc2544'";
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:rfc2544')";
+     description
+       "Augment the service session protocol of Accedian-service-session with SAT RFC2544
+       config data";
+@@ -151,9 +164,7 @@ module Accedian-session-rfc2544 {
+           when "../../transport-type = 'layer2'";
+ 
+           leaf y1731-meg-level {
+-            type uint8 {
+-              range 0..7;
+-            }
++            type acdnt:y1731-meg-level;
+             description
+               "Y.1731 Maintenance Entity Group level";
+           }
+@@ -213,7 +224,7 @@ module Accedian-session-rfc2544 {
+ 
+           leaf jumbo-frame-size {
+             type uint16 {
+-              range 64..10240;
++              range "64..10240";
+             }
+             units bytes;
+             default 2000;
+@@ -223,7 +234,7 @@ module Accedian-session-rfc2544 {
+ 
+           leaf binary-duration {
+             type uint8 {
+-              range 1..10;
++              range "1..10";
+             }
+             units seconds;
+             default 2;
+@@ -252,25 +263,33 @@ module Accedian-session-rfc2544 {
+               "Throughput test settings";
+ 
+             leaf step-size {
+-              type uint32;
+-              default 5;
++              type step-size;
+               description
+-                "Granularity of the min-max range";
++                "Throughput step size during the test";
+             }
+ 
+             leaf minimum-rate {
+-              type uint32;
++              type uint16 {
++                range "1..10000";
++              }
+               units megabits-per-second;
+               default 1;
+               description
+-                "Minimum rate";
++                "Minimum rate.
++                Note: the minimum rate must be smaller than maximum-rate";
+             }
+             leaf maximum-rate {
+-              type uint32;
++              type uint16 {
++                range "1..10000";
++              }
+               units megabits-per-second;
+               default 100;
+               description
+-                "Maximum rate";
++                "Maximum rate.
++                Note: The maximum-rate config must be smaller or equal to the
++                maximal physical port speed used for the RFC2544 test. For
++                example, a speed of 10000 (10Gbps) will return an config error
++                on 1Gbps ports/devices";
+             }
+ 
+             leaf fine-stepping {
+@@ -323,12 +342,9 @@ module Accedian-session-rfc2544 {
+             }
+ 
+             leaf step-size {
+-              type uint16 {
+-                range 1..5000;
+-              }
+-              default 5;
++              type step-size;
+               description
+-                "Granularity of the min-max range";
++                "Throughput step size during the test";
+             }
+           }
+ 
+@@ -373,7 +389,7 @@ module Accedian-session-rfc2544 {
+ 
+             leaf repeat {
+               type uint8 {
+-                range 1..100;
++                range "1..100";
+               }
+               default 50;
+               description
+diff --git a/accedian/public/Accedian-session-throughput@2024-08-31.yang b/accedian/public/Accedian-session-throughput@2024-08-31.yang
+index 3c63a43..0b94edb 100644
+--- a/accedian/public/Accedian-session-throughput@2024-08-31.yang
++++ b/accedian/public/Accedian-session-throughput@2024-08-31.yang
+@@ -46,7 +46,7 @@ module Accedian-session-throughput {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:throughput-session'" {
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:throughput-session')" {
+       description
+         "Augment the service session protocol of Accedian-service-session with throughput
+         config data";
+@@ -104,7 +104,7 @@ module Accedian-session-throughput {
+ 
+         leaf duration {
+           type uint32 {
+-            range 0..86400;
++            range "0..86400";
+           }
+           units seconds;
+           default 60;
+@@ -114,7 +114,7 @@ module Accedian-session-throughput {
+ 
+         leaf report-interval {
+           type uint8 {
+-            range 1..60;
++            range "1..60";
+           }
+           units seconds;
+           default 1;
+@@ -125,7 +125,7 @@ module Accedian-session-throughput {
+ 
+         leaf parallel {
+           type uint8 {
+-            range 1..128;
++            range "1..128";
+           }
+           default 1;
+           description
+@@ -155,7 +155,7 @@ module Accedian-session-throughput {
+ 
+         leaf network-mtu {
+           type uint16 {
+-            range 0..9000;
++            range "0..9000";
+           }
+           units bytes;
+           default 1500;
+diff --git a/accedian/public/Accedian-session-twamp-light@2024-08-31.yang b/accedian/public/Accedian-session-twamp-light@2024-08-31.yang
+index ee9ee03..7c35f4f 100644
+--- a/accedian/public/Accedian-session-twamp-light@2024-08-31.yang
++++ b/accedian/public/Accedian-session-twamp-light@2024-08-31.yang
+@@ -90,7 +90,7 @@ module Accedian-session-twamp-light {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:twamp-light'";
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:twamp-light')";
+     description
+       "Augment the service session protocol of Accedian-service-session with twamp light
+       config data";
+@@ -152,7 +152,7 @@ module Accedian-session-twamp-light {
+ 
+         leaf report-interval {
+           type uint16 {
+-            range 1..900;
++            range "1..900";
+           }
+           default 30;
+           description
+@@ -178,7 +178,7 @@ module Accedian-session-twamp-light {
+           leaf number-of-packets {
+             type union {
+               type uint32 {
+-                range 10..250000;
++                range "10..250000";
+               }
+               type enumeration {
+                 enum continuous {
+@@ -198,7 +198,7 @@ module Accedian-session-twamp-light {
+ 
+           leaf payload-size {
+             type uint32 {
+-              range 41..1472;
++              range "41..1472";
+             }
+             default 82;
+             description
+@@ -207,7 +207,7 @@ module Accedian-session-twamp-light {
+ 
+           leaf rate {
+             type uint16 {
+-              range 1..1000;
++              range "1..1000";
+             }
+             default 10;
+             description
+diff --git a/accedian/public/Accedian-session-type@2024-08-31.yang b/accedian/public/Accedian-session-type@2024-08-31.yang
+index d6c1e59..75c15cc 100644
+--- a/accedian/public/Accedian-session-type@2024-08-31.yang
++++ b/accedian/public/Accedian-session-type@2024-08-31.yang
+@@ -103,17 +103,17 @@ module Accedian-session-type {
+       "Defines the different status that can apply to a service endpoint";
+ 
+     type enumeration {
+-      enum "Running" {
++      enum "running" {
+         description
+           "The session is started and running.";
+       }
+ 
+-      enum "Stopped" {
++      enum "stopped" {
+         description
+           "The session is stopped and not running. A rpc start is required to start the session";
+       }
+ 
+-      enum "Error" {
++      enum "error" {
+         description
+           "The session is currently in error state. It currently cannot be started";
+       }
+diff --git a/accedian/public/Accedian-session-y1564@2024-08-31.yang b/accedian/public/Accedian-session-y1564@2024-08-31.yang
+index 1d13857..6c7bbd0 100644
+--- a/accedian/public/Accedian-session-y1564@2024-08-31.yang
++++ b/accedian/public/Accedian-session-y1564@2024-08-31.yang
+@@ -90,7 +90,7 @@ module Accedian-session-y1564 {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:y1564'";
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:y1564')";
+     description
+       "Augment the service session protocol of Accedian-service-session with SAT
+       config data";
+@@ -130,9 +130,7 @@ module Accedian-session-y1564 {
+           when "../../transport-type = 'layer2'";
+ 
+           leaf y1731-meg-level {
+-            type uint8 {
+-              range 0..7;
+-            }
++            type acdnt:y1731-meg-level;
+             description
+               "Y.1731 Maintenance Entity Group level";
+           }
+@@ -162,7 +160,7 @@ module Accedian-session-y1564 {
+ 
+           leaf step-duration {
+             type uint8 {
+-              range 1..60;
++              range "1..60";
+             }
+             units seconds;
+             default 10;
+@@ -179,7 +177,7 @@ module Accedian-session-y1564 {
+ 
+           leaf test-duration {
+             type uint16 {
+-              range 1..1440;
++              range "1..1440";
+             }
+             units minutes;
+             default 15;
+@@ -191,13 +189,14 @@ module Accedian-session-y1564 {
+         list service {
+           key service-name;
+           ordered-by user;
++          max-elements 8;
+           description
+-            "";
++            "A list of ITU-Y1564 services";
+ 
+           leaf service-name {
+             type string;
+             description
+-              "";
++              "The name of this specific service";
+           }
+ 
+           leaf frame-size-type {
+@@ -211,7 +210,7 @@ module Accedian-session-y1564 {
+           leaf fixed-packet-size {
+             when "../frame-size-type = 'fixed'";
+             type uint16 {
+-              range 64..10240;
++              range "64..10240";
+             }
+             units bytes;
+             default 512;
+@@ -222,7 +221,10 @@ module Accedian-session-y1564 {
+ 
+           leaf emix-size-sequence {
+             when "../frame-size-type = 'emix'";
+-            type string;
++            type string {
++              length "1..8";
++              pattern '[abcdefgu]+';
++            }
+             default "bceg";
+             description
+               "Specify the EMIX sequence of packet sizes for the test";
+@@ -238,28 +240,30 @@ module Accedian-session-y1564 {
+ 
+           leaf cir {
+             type decimal64 {
+-              range 1..1000;
++              range "0.125..1000.0";
+               fraction-digits 3;
+             }
+             units megabits-per-second;
+             default 10.0;
+             description
+-              "Committed information rate";
++              "Committed information rate. The value must be a multiple of 0.125";
+           }
+ 
+           leaf eir {
+             type decimal64 {
+-              range 1..10000;
++              range "0.125..1000.0";
+               fraction-digits 3;
+             }
+             units megabits-per-second;
+-            default 3;
++            default 3.0;
+             description
+-              "Excess information rate";
++              "Excess information rate. The value must be a multiple of 0.125";
+           }
+ 
+           leaf fdv {
+-            type uint32;
++            type uint32 {
++              range "0..2147483647";
++            }
+             units microseconds;
+             default 1000;
+             description
+@@ -278,15 +282,18 @@ module Accedian-session-y1564 {
+           leaf flr {
+             type decimal64 {
+               fraction-digits 10;
++              range "0.0000000001..0.999";
+             }
+-            units fraction;
++            units ratio;
+             default 0.000001;
+             description
+               "Maximum Frame Loss Ratio (FLR) allowed";
+           }
+ 
+           leaf ftd {
+-            type uint32;
++            type uint32 {
++              range "0..2147483647";
++            }
+             units microseconds;
+             default 5000;
+             description
+@@ -304,8 +311,10 @@ module Accedian-session-y1564 {
+ 
+           leaf m-factor {
+             type decimal64 {
+-              fraction-digits 1;
++              fraction-digits 3;
++              range "0.001..1000.0";
+             }
++            units megabits-per-second;
+             default 1.0;
+             description
+               "The M factor is added to the Service Acceptance Criteria in the
+@@ -319,7 +328,7 @@ module Accedian-session-y1564 {
+ 
+           leaf out-of-order {
+             type uint8 {
+-              range 0..100;
++              range "0..100";
+             }
+             units percentage;
+             description
+@@ -374,9 +383,7 @@ module Accedian-session-y1564 {
+               }
+ 
+               leaf y1731-meg-level {
+-                type uint8 {
+-                  range 0..7;
+-                }
++                type acdnt:y1731-meg-level;
+                 description
+                   "Y.1731 Maintenance Entity Group level";
+               }
+@@ -384,8 +391,6 @@ module Accedian-session-y1564 {
+ 
+             container layer3 {
+               when "../../../../transport-type = 'layer3'";
+-              description
+-                "";
+ 
+               leaf ip {
+                 type inet:ip-address;
+diff --git a/accedian/public/Accedian-throughput-capabilities@2024-08-31.yang b/accedian/public/Accedian-throughput-capabilities@2024-08-31.yang
+index 920b382..8fed4fe 100644
+--- a/accedian/public/Accedian-throughput-capabilities@2024-08-31.yang
++++ b/accedian/public/Accedian-throughput-capabilities@2024-08-31.yang
+@@ -26,21 +26,20 @@ module Accedian-throughput-capabilities {
+     Phone: +1.514.331.6181 or +1.866.685.8181";
+ 
+   description
+-  "This module contains the type definitions of Throughput capabilities.
++    "This module contains the type definitions of Throughput capabilities.
+ 
+     Copyright (c) Accedian Networks, Inc.
+     All rights reserved";
+ 
+-  revision 2023-11-24 {
++  revision 2024-08-31 {
+     description
+       "Initial revision";
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-capabilities" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-type = 'acdst:throughput'";
+-
+-      description
+-        "Augment Accedian service-endpoint capabilities with throughput specific capabilities";
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-type, 'acdst:throughput')";
++    description
++      "Augment Accedian service-endpoint capabilities with throughput specific capabilities";
+ 
+     container throughput-capabilities {
+       description
+diff --git a/accedian/public/Accedian-twamp-light-capabilities@2023-11-24.yang b/accedian/public/Accedian-twamp-light-capabilities@2023-11-24.yang
+index b2693e0..7a9082f 100644
+--- a/accedian/public/Accedian-twamp-light-capabilities@2023-11-24.yang
++++ b/accedian/public/Accedian-twamp-light-capabilities@2023-11-24.yang
+@@ -26,7 +26,7 @@ module Accedian-twamp-light-capabilities {
+     Phone: +1.514.331.6181 or +1.866.685.8181";
+ 
+   description
+-  "This module contains the type definitions of TWAMP-Light capabilities.
++    "This module contains the type definitions of TWAMP-Light capabilities.
+ 
+     Copyright (c) Accedian Networks, Inc.
+     All rights reserved";
+@@ -37,8 +37,7 @@ module Accedian-twamp-light-capabilities {
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-capabilities" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-type = 'acdst:twamp-light'" {
+-
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:state/acdsep:capabilities/acdsep:session-type, 'acdst:twamp-light')" {
+       description
+         "Augment Accedian service-endpoint capabilities with twamp-light specific capabilities";
+     }
+@@ -47,7 +46,6 @@ module Accedian-twamp-light-capabilities {
+       description
+         "TWAMP-Light specific capabilities";
+ 
+-
+       list capability {
+         key capability-key;
+         description
+diff --git a/accedian/public/future/Accedian-session-echo@2024-08-31.yang b/accedian/public/future/Accedian-session-echo@2024-08-31.yang
+index e75ecd2..f45cc08 100644
+--- a/accedian/public/future/Accedian-session-echo@2024-08-31.yang
++++ b/accedian/public/future/Accedian-session-echo@2024-08-31.yang
+@@ -46,7 +46,7 @@ module Accedian-session-echo {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:echo-session'";
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:echo-session')";
+     description
+       "Augment the service session protocol of Accedian-service-session with echo
+       config data";
+@@ -57,7 +57,7 @@ module Accedian-session-echo {
+ 
+       leaf report-interval {
+         type uint16 {
+-          range 1..900;
++          range "1..900";
+         }
+         units seconds;
+         default 30;
+@@ -94,7 +94,7 @@ module Accedian-session-echo {
+ 
+         leaf payload-size {
+           type uint16 {
+-            range 20..1472;
++            range "20..1472";
+           }
+           units bytes;
+           default 82;
+@@ -104,7 +104,7 @@ module Accedian-session-echo {
+ 
+         leaf rate {
+           type uint16 {
+-            range 1..1000;
++            range "1..1000";
+           }
+           units packets-per-second;
+           default 10;
+diff --git a/accedian/public/future/Accedian-session-pathtrace@2024-08-31.yang b/accedian/public/future/Accedian-session-pathtrace@2024-08-31.yang
+index 3ab9349..839308a 100644
+--- a/accedian/public/future/Accedian-session-pathtrace@2024-08-31.yang
++++ b/accedian/public/future/Accedian-session-pathtrace@2024-08-31.yang
+@@ -48,7 +48,7 @@ module Accedian-session-pathtrace {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:pathtrace-session'" {
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:pathtrace-session')" {
+       description
+         "Augment the service session protocol of Accedian-service-session with pathtrace
+         config data";
+@@ -63,7 +63,7 @@ module Accedian-session-pathtrace {
+ 
+       leaf probing-rate {
+         type uint8 {
+-          range 1..99;
++          range "1..99";
+         }
+         units seconds;
+         default 10;
+@@ -73,7 +73,7 @@ module Accedian-session-pathtrace {
+ 
+       leaf probes-per-hop {
+         type uint8 {
+-          range 1..255;
++          range "1..255";
+         }
+         default 3;
+         description
+@@ -82,7 +82,7 @@ module Accedian-session-pathtrace {
+ 
+       leaf max-undiscovered {
+         type uint8 {
+-          range 1..255;
++          range "1..255";
+         }
+         units hops;
+         default 3;
+@@ -161,7 +161,7 @@ module Accedian-session-pathtrace {
+ 
+           leaf start-ttl {
+             type uint8 {
+-              range 0..255;
++              range "0..255";
+             }
+             default 1;
+             description
+@@ -170,7 +170,7 @@ module Accedian-session-pathtrace {
+ 
+           leaf end-ttl {
+             type uint8 {
+-              range 0..255;
++              range "0..255";
+             }
+             default 30;
+             description
+diff --git a/accedian/public/future/Accedian-session-transfer@2024-08-31.yang b/accedian/public/future/Accedian-session-transfer@2024-08-31.yang
+index 0ad5582..0765243 100644
+--- a/accedian/public/future/Accedian-session-transfer@2024-08-31.yang
++++ b/accedian/public/future/Accedian-session-transfer@2024-08-31.yang
+@@ -42,7 +42,7 @@ module Accedian-session-transfer {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:transfer'";
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:transfer')";
+     description
+       "Augment the service session protocol of Accedian-service-session with
+       the config data for a transfer session";
+@@ -67,7 +67,7 @@ module Accedian-session-transfer {
+ 
+       leaf test-interval {
+         type uint32 {
+-          range 1..max;
++          range "1..max";
+         }
+         default 60;
+         description
+diff --git a/accedian/public/obsolete/Accedian-service-endpoint-ne@2023-02-10.yang b/accedian/public/obsolete/Accedian-service-endpoint-ne@2023-02-10.yang
+index 71dbd63..4c3c3ea 100644
+--- a/accedian/public/obsolete/Accedian-service-endpoint-ne@2023-02-10.yang
++++ b/accedian/public/obsolete/Accedian-service-endpoint-ne@2023-02-10.yang
+@@ -50,7 +50,7 @@ module Accedian-service-endpoint-ne {
+   }
+ 
+   augment "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:config" {
+-    when "/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type = 'acdsept:ne-endpoint'" {
++    when "derived-from-or-self(/acdsep:service-endpoints/acdsep:service-endpoint/acdsep:type, 'acdsept:ne-endpoint')" {
+ 
+       description
+         "Augment Accedian service-endpoint data with NE support";
+diff --git a/accedian/public/obsolete/Accedian-session-twamp-light@2023-02-10.yang b/accedian/public/obsolete/Accedian-session-twamp-light@2023-02-10.yang
+index 9cb5da6..e5556fc 100644
+--- a/accedian/public/obsolete/Accedian-session-twamp-light@2023-02-10.yang
++++ b/accedian/public/obsolete/Accedian-session-twamp-light@2023-02-10.yang
+@@ -83,7 +83,7 @@ module Accedian-session-twamp-light {
+   }
+ 
+   augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+-    when "/acdses:sessions/acdses:session/acdses:session-type = 'acdstype:twamp-light-session'";
++    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:twamp-light-session')";
+     description
+       "Augment the service session protocol of Accedian-service-session with twamp light
+       config data";
+@@ -151,7 +151,7 @@ module Accedian-session-twamp-light {
+ 
+         leaf report-interval {
+           type uint16 {
+-            range 1..900;
++            range "1..900";
+           }
+           default 30;
+           description
+@@ -195,7 +195,7 @@ module Accedian-session-twamp-light {
+ 
+           leaf payload-size {
+             type uint32 {
+-              range 41..1472;
++              range "41..1472";
+             }
+             default 82;
+             description
+@@ -204,7 +204,7 @@ module Accedian-session-twamp-light {
+ 
+           leaf rate {
+             type uint16 {
+-              range 1..1000;
++              range "1..1000";
+             }
+             default 10;
+             description
+@@ -221,7 +221,7 @@ module Accedian-session-twamp-light {
+ 
+           leaf ttl {
+             type uint8 {
+-              range 0..255;
++              range "0..255";
+             }
+             default 255;
+             description
+@@ -231,7 +231,7 @@ module Accedian-session-twamp-light {
+ 
+           leaf vlan-priority {
+             type uint8 {
+-              range 0..7;
++              range "0..7";
+             }
+             default 0;
+             description

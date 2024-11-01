@@ -1,0 +1,167 @@
+module Accedian-session-echo {
+  yang-version 1.1;
+  namespace "http://accedian.com/ns/yang/session/echo";
+  prefix acdsecho;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  import Accedian-net-type {
+    prefix acdnt;
+  }
+
+  import Accedian-session {
+    prefix acdses;
+  }
+
+  import Accedian-session-type {
+    prefix acdstype;
+  }
+
+  organization
+    "Accedian Networks Inc.";
+  contact
+    "Accedian Networks Inc.
+
+    https://accedian.com/
+    Email: info@accedian.com
+
+    2351 Blvd Alfred-Nobel, Suite N-410
+    Saint-Laurent (Montreal), Quebec,
+    H4S 2A9, Canada
+
+    Phone: +1.514.331.6181 or +1.866.685.8181";
+
+  description
+    "The Echo session type supports ping like echo session
+    over UDP.
+
+    Copyright (c) Accedian Networks, Inc.
+    All rights reserved";
+
+  revision 2024-08-31 {
+    description
+      "Initial revision";
+  }
+
+  augment "/acdses:sessions/acdses:session/acdses:service-endpoints/acdses:session-protocol" {
+    when "derived-from-or-self(/acdses:sessions/acdses:session/acdses:session-type, 'acdstype:echo-session')";
+    description
+      "Augment the service session protocol of Accedian-service-session with echo
+      config data";
+
+    container echo {
+      description
+        "Echo session configuration data";
+
+      leaf report-interval {
+        type uint16 {
+          range "1..900";
+        }
+        units seconds;
+        default 30;
+        description
+          "Reporting interval";
+      }
+
+      container session-sender {
+        description
+          "Echo packet generator configuration data";
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the associated session
+            endpoint is operating as a echo packet
+            generator";
+        }
+
+        leaf generator-ip {
+          type inet:ip-address;
+          description
+            "The IP address of the generator interface.
+            If not specified, the packets will be sent using
+            the generator local network configuration";
+        }
+
+        leaf generator-udp-port {
+          type acdnt:source-port-number;
+          description
+            "The UDP port number to use as a source UDP port";
+        }
+
+        leaf payload-size {
+          type uint16 {
+            range "20..1472";
+          }
+          units bytes;
+          default 82;
+          description
+            "Echo payload size";
+        }
+
+        leaf rate {
+          type uint16 {
+            range "1..1000";
+          }
+          units packets-per-second;
+          default 10;
+          description
+            "Echo packet rate";
+        }
+
+        leaf dscp {
+          type acdnt:dscp;
+          description
+            "Echo generator DSCP value";
+        }
+
+        leaf ttl {
+          type acdnt:ttl;
+          description
+            "Echo generator TTL value";
+        }
+
+        leaf vlan-prio {
+          type acdnt:vlan-prio;
+          description
+            "Echo generator VLAN prio";
+        }
+      }
+
+      container session-reflector {
+        description
+          "Echo packet reflector configuration data";
+
+        leaf admin-state {
+          type boolean;
+          default false;
+          description
+            "Indicates whether the associated session
+            endpoint is operating as a echo session
+            reflector";
+        }
+
+        leaf reflector-ip {
+          type inet:ip-address;
+          description
+            "The IP address of reflector interface.
+            If not specified, the address configured in the
+            associated session endpoint will be used. If a
+            peered endpoint is not defined or if the peer doesn't
+            specify an address, an error will be returned";
+        }
+
+        leaf reflector-udp-port {
+          type inet:port-number;
+          default 7;
+          description
+            "This parameter defines the UDP port number binded by the echo
+            reflector server";
+        }
+      }
+    }
+  }
+}
